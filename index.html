@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Livelihood Assistance Monitoring System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/png" href="/logo.png">
 <script src="/icons.js"></script>
 <style>
@@ -42,20 +43,21 @@
   body{
     margin:0; font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(--text);
   }
+  .app-topbar{position:sticky; top:0; z-index:100;}
   header.appbar{
     background:var(--navy); color:#fff; padding:14px 24px; display:flex; align-items:center; justify-content:space-between;
-    position:sticky; top:0; z-index:100;
+    gap:12px; flex-wrap:wrap;
   }
-  header.appbar .brand{display:flex; align-items:center; gap:12px;}
-  header.appbar .brand img{height:38px; width:38px;}
+  header.appbar .brand{display:flex; align-items:center; gap:12px; min-width:0;}
+  header.appbar .brand img{height:38px; width:38px; flex-shrink:0;}
   header.appbar h1{font-size:17px; margin:0; font-weight:600;}
   nav.tabs{
     display:flex; gap:6px; background:var(--navy-dark); padding:0 20px;
-    position:sticky; top:66px; z-index:99;
+    overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:thin;
   }
   nav.tabs .tab-btn{
     background:transparent; border:none; color:#cfd8e3; padding:12px 16px; font-size:13.5px; cursor:pointer; border-bottom:3px solid transparent;
-    text-decoration:none; display:inline-block; font-family:inherit;
+    text-decoration:none; display:inline-block; font-family:inherit; white-space:nowrap; flex-shrink:0;
   }
   nav.tabs .tab-btn.active{color:#fff; border-bottom:3px solid var(--accent); font-weight:600;}
   main{max-width:960px; margin:24px auto; padding:0 16px 60px;}
@@ -86,8 +88,9 @@
   button.secondary:hover{background:#eef2f6;}
   button.danger{background:#fff; color:var(--accent); border:1px solid var(--accent); padding:6px 12px; border-radius:5px; font-size:12px; cursor:pointer;}
   .hint{font-size:12px; color:var(--muted); margin-top:-8px; margin-bottom:14px;}
-  .sig-pad-wrap{border:1px solid var(--border); border-radius:6px; background:#fff; display:inline-block;}
-  .sig-pad{display:block; touch-action:none; cursor:crosshair; border-radius:6px;}
+  .sig-pad-wrap{border:1px solid var(--border); border-radius:6px; background:#fff; display:inline-block; max-width:100%;}
+  .sig-pad{display:block; touch-action:none; cursor:crosshair; border-radius:6px; max-width:100%; height:auto;}
+  .table-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch;}
 
   /* Records filter bar */
   .filter-bar{display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin-top:16px; padding-top:16px; border-top:1px solid var(--border);}
@@ -113,8 +116,9 @@
   .empty{color:var(--muted); font-size:13.5px; text-align:center; padding:30px 0;}
 
   /* Document / preview */
+  .docsheet-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch; padding:0 2px;}
   #docSheet{
-    background:#fff; width:794px; margin:0 auto; padding:50px 55px 40px; border:1px solid #ccc; box-shadow:0 2px 10px rgba(0,0,0,.08); font-family:Arial, sans-serif; color:#111;
+    background:#fff; width:794px; flex-shrink:0; margin:0 auto; padding:50px 55px 40px; border:1px solid #ccc; box-shadow:0 2px 10px rgba(0,0,0,.08); font-family:Arial, sans-serif; color:#111;
   }
   #docSheet img.letterhead{width:100%; display:block; margin-bottom:6px;}
   #docSheet hr.ruleline{border:none; border-top:2px solid #111; margin:6px 0 16px;}
@@ -175,22 +179,52 @@
   .status-row .slabel{flex:1; color:var(--text);}
   .status-row .scount{font-weight:700; color:var(--navy); font-variant-numeric:tabular-nums;}
 
+  /* ---------- Mobile / narrow viewport overrides ---------- */
+  @media (max-width:640px){
+    header.appbar{padding:12px 16px;}
+    header.appbar h1{font-size:14.5px;}
+    header.appbar .brand img{height:32px; width:32px;}
+    nav.tabs{padding:0 8px;}
+    nav.tabs .tab-btn{padding:11px 12px; font-size:12.5px;}
+    main{padding:0 12px 40px; margin:16px auto;}
+    .card{padding:16px 16px;}
+
+    .grid2, .checkbox-grid{grid-template-columns:1fr;}
+
+    .record-row{flex-direction:column; align-items:flex-start; gap:8px;}
+    .record-actions{flex-wrap:wrap; width:100%;}
+    .record-actions button{flex:1; justify-content:center;}
+
+    .filter-bar{flex-direction:column; align-items:stretch;}
+    .filter-bar .field{width:100%; flex:none !important;}
+    .filter-bar #btnClearFilters{align-self:stretch !important; justify-content:center;}
+
+    .preview-toolbar{flex-wrap:wrap;}
+
+    .hbar-row{grid-template-columns:90px 1fr auto; gap:6px; font-size:11.5px;}
+    .stat-grid{grid-template-columns:repeat(2, 1fr);}
+  }
+  @media (max-width:400px){
+    .stat-grid{grid-template-columns:1fr;}
+  }
+
   @media print{
     body *{visibility:hidden;}
     #docSheet, #docSheet *{visibility:visible;}
     #docSheet{position:absolute; top:0; left:0; box-shadow:none; border:none; width:100%; margin:0; padding:30px 40px;}
-    .preview-toolbar, header.appbar, nav.tabs{display:none !important;}
+    .preview-toolbar, .app-topbar{display:none !important;}
   }
 </style>
 </head>
 <body>
 
+<div class="app-topbar">
 <header class="appbar">
   <div class="brand">
     <img src="/logo.png" alt="City of Vigan seal">
     <h1>Livelihood Assistance Monitoring System</h1>
   </div>
-  <div style="display:flex; align-items:center; gap:16px; font-size:12px;">
+  <div style="display:flex; align-items:center; gap:16px; font-size:12px; flex-wrap:wrap;">
     <span id="whoami" style="opacity:.85;"></span>
     <a href="/admin" data-icon="shield-check" style="display:inline-flex; align-items:center; gap:5px; color:#cfd8e3; text-decoration:none;">Admin</a>
     <button id="btnLogout" data-icon="log-out" style="background:transparent; border:1px solid rgba(255,255,255,.5); color:#fff; padding:5px 11px; border-radius:5px; font-size:11.5px; cursor:pointer;">Log out</button>
@@ -202,6 +236,7 @@
   <button class="tab-btn" data-tab="records" data-icon="folder-open">Saved Records</button>
   <button class="tab-btn" data-tab="preview" data-icon="printer">Preview &amp; Print</button>
 </nav>
+</div>
 
 <datalist id="dl_program"></datalist>
 <datalist id="dl_assistance_type"></datalist>
@@ -281,10 +316,12 @@
 
   <div class="card">
     <h2>I. Status of Livelihood</h2>
+    <div class="table-scroll">
     <table class="indicators" id="statusTable">
       <thead><tr><th>Indicator</th><th class="center">Yes</th><th class="center">No</th><th>Remarks</th></tr></thead>
       <tbody></tbody>
     </table>
+    </div>
   </div>
 
   <div class="card">
@@ -422,7 +459,9 @@
     <button class="secondary" id="btnDownloadDocx" data-icon="file-check">Download DOCX</button>
     <button class="secondary" id="btnBackToForm" data-icon="chevron-left">Back to Edit</button>
   </div>
-  <div id="docSheet"></div>
+  <div class="docsheet-wrap">
+    <div id="docSheet"></div>
+  </div>
 </section>
 
 </main>
