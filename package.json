@@ -1,0 +1,21 @@
+{
+  "name": "livelihood-monitoring-system",
+  "version": "1.0.0",
+  "description": "Livelihood Assistance Monitoring System - CSWDO, City of Vigan",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "migrate:legacy": "node scripts/migrate-legacy.js"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.18.0",
+    "cookie-parser": "^1.4.7",
+    "docx": "^9.7.1",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0"
+  }
+}

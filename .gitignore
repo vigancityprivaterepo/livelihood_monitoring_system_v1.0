@@ -1,0 +1,12 @@
+node_modules/
+
+# Local SQLite database - contains real beneficiary PII and is a runtime artifact,
+# not source. Production data lives in Turso; local dev regenerates this file from
+# scratch (or from scripts/migrate-legacy.js) as needed.
+livelihood.db
+livelihood.db-*
+livelihood.db.backup*
+
+# Secrets
+.env
+.env.local

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin - Livelihood Assistance Monitoring System</title>
+<link rel="icon" type="image/png" href="/logo.png">
+<script src="/icons.js"></script>
+<style>
+  :root{
+    --navy:#047857; --navy-dark:#065f46; --accent:#c0392b; --bg:#e9edf0;
+    --card:#ffffff; --border:#b9c2c9; --text:#15181b; --muted:#48525c;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:'Segoe UI',Arial,sans-serif; background:var(--bg); color:var(--text);}
+  header.appbar{
+    background:var(--navy); color:#fff; padding:14px 24px; display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:100;
+  }
+  header.appbar .brand{display:flex; align-items:center; gap:12px;}
+  header.appbar .brand img{height:38px; width:38px;}
+  header.appbar h1{font-size:16px; margin:0; font-weight:600;}
+  header.appbar .right{display:flex; align-items:center; gap:14px; font-size:12.5px;}
+  header.appbar a{color:#cfd8e3; text-decoration:none;}
+  header.appbar a:hover{color:#fff;}
+  header.appbar button{background:transparent; border:1px solid rgba(255,255,255,.5); color:#fff; padding:6px 12px; border-radius:5px; font-size:12px; cursor:pointer;}
+  main{max-width:820px; margin:24px auto; padding:0 16px 60px;}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:8px; padding:22px 26px; margin-bottom:20px; box-shadow:0 1px 2px rgba(15,23,28,.05), 0 1px 8px rgba(15,23,28,.04);}
+  .card h2{font-size:17px; font-weight:700; color:var(--text); margin:0 0 16px; padding-left:12px; border-left:4px solid var(--navy);}
+  .hint{font-size:12px; color:var(--muted); margin-top:-8px; margin-bottom:14px;}
+  .option-row{display:flex; align-items:center; justify-content:space-between; padding:7px 4px; border-bottom:1px solid var(--border); font-size:13.5px;}
+  .option-row:last-child{border-bottom:none;}
+  .option-empty{color:var(--muted); font-size:12.5px; padding:8px 0;}
+  .btnrow{display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;}
+  .btnrow input[type=text], .btnrow input[type=password]{flex:1; padding:8px 10px; border:1px solid var(--border); border-radius:5px; font-size:13.5px; min-width:140px;}
+  .staff-row{display:flex; align-items:center; justify-content:space-between; padding:9px 4px; border-bottom:1px solid var(--border); font-size:13.5px; gap:10px;}
+  .staff-row:last-child{border-bottom:none;}
+  .staff-row .uname{font-weight:600;}
+  .staff-row .actions{display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
+  .sig-row{display:flex; align-items:center; justify-content:space-between; padding:9px 4px; border-bottom:1px solid var(--border); font-size:13.5px; gap:10px;}
+  .sig-row:last-child{border-bottom:none;}
+  .sig-row .sig-info{display:flex; align-items:center; gap:12px;}
+  .sig-row .sig-thumb{height:40px; max-width:140px; background:#fff; border:1px solid var(--border); border-radius:4px; padding:3px;}
+  .sig-row .sig-name{font-weight:600;}
+  .btnrow input[type=file]{flex:1; padding:6px 4px; font-size:12.5px; min-width:180px;}
+  .pill{display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:600; margin-left:8px;}
+  .pill-active{background:#e4f6ea; color:#1c7a3d;}
+  .pill-inactive{background:#eee; color:#555;}
+  button.primary, button.secondary, button.danger, header.appbar a, header.appbar button{display:inline-flex; align-items:center; gap:6px;}
+  .lucide-icon{flex-shrink:0;}
+  button.primary{background:var(--navy); color:#fff; border:none; padding:9px 16px; border-radius:6px; font-size:13px; cursor:pointer; font-weight:600;}
+  button.primary:hover{background:var(--navy-dark);}
+  button.secondary{background:#fff; color:var(--navy); border:1px solid var(--navy); padding:9px 16px; border-radius:6px; font-size:13px; cursor:pointer; font-weight:600;}
+  button.secondary:hover{background:#eef2f6;}
+  button.danger{background:#fff; color:var(--accent); border:1px solid var(--accent); padding:6px 12px; border-radius:5px; font-size:12px; cursor:pointer;}
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <div class="brand">
+    <img src="/logo.png" alt="City of Vigan seal">
+    <h1>Admin</h1>
+  </div>
+  <div class="right">
+    <a href="/" data-icon="chevron-left">Back to app</a>
+    <a href="/#dashboard" data-icon="layout-dashboard">Dashboard</a>
+    <button id="btnLogout" data-icon="log-out">Log out of Admin</button>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <h2>Manage Staff Accounts</h2>
+    <p class="hint">Staff use these accounts to log in to the form/records app at the main login page. Only Admin can create, edit, deactivate, or delete accounts.</p>
+    <div class="staff-rows" id="staffRows"></div>
+    <div class="btnrow">
+      <input type="text" id="newStaffUsername" placeholder="Username">
+      <input type="password" id="newStaffPassword" placeholder="Password (min 6 characters)">
+      <button class="primary" id="btnAddStaff" data-icon="plus">Add Staff</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Monitoring Officer Signatures</h2>
+    <p class="hint">Upload a scanned or digital signature image for each officer once here. When that officer's name is used on a monitoring form, their signature is stamped onto the generated document automatically.</p>
+    <div class="sig-rows" id="sigRows"></div>
+    <div class="btnrow">
+      <input type="text" id="newSigOfficerName" placeholder="Officer full name (must match Monitoring Officer Name on the form)">
+      <input type="file" id="newSigFile" accept="image/*">
+      <button class="primary" id="btnUploadSig" data-icon="upload">Upload Signature</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Manage Dropdown Values</h2>
+    <p class="hint">These values show up as quick-pick suggestions on Program, Type of Livelihood Assistance Received, and Type of Business. Staff can still type a custom value not on the list.</p>
+  </div>
+  <div class="card" data-admin-list="program">
+    <h2>Program</h2>
+    <div class="option-rows"></div>
+    <div class="btnrow">
+      <input type="text" class="option-new-value" placeholder="Add new value">
+      <button class="secondary option-add-btn" data-icon="plus">Add</button>
+      <button class="primary option-save-btn" data-icon="save">Save List</button>
+    </div>
+  </div>
+  <div class="card" data-admin-list="assistance_type">
+    <h2>Type of Livelihood Assistance Received</h2>
+    <div class="option-rows"></div>
+    <div class="btnrow">
+      <input type="text" class="option-new-value" placeholder="Add new value">
+      <button class="secondary option-add-btn" data-icon="plus">Add</button>
+      <button class="primary option-save-btn" data-icon="save">Save List</button>
+    </div>
+  </div>
+  <div class="card" data-admin-list="biz_type">
+    <h2>Type of Business</h2>
+    <div class="option-rows"></div>
+    <div class="btnrow">
+      <input type="text" class="option-new-value" placeholder="Add new value">
+      <button class="secondary option-add-btn" data-icon="plus">Add</button>
+      <button class="primary option-save-btn" data-icon="save">Save List</button>
+    </div>
+  </div>
+</main>
+
+<script>
+document.querySelectorAll('[data-icon]').forEach(el=>{
+  el.insertAdjacentHTML('afterbegin', icon(el.dataset.icon, {size:15}));
+});
+
+async function guardedFetch(url, opts){
+  const res = await fetch(url, opts);
+  if(res.status === 401){
+    window.location.href = '/admin/login';
+    throw new Error('Not authenticated');
+  }
+  return res;
+}
+
+/* ---------- Staff accounts ---------- */
+async function loadStaff(){
+  const res = await guardedFetch('/api/staff');
+  const staff = await res.json();
+  renderStaff(staff);
+}
+
+function renderStaff(staff){
+  const el = document.getElementById('staffRows');
+  if(staff.length === 0){
+    el.innerHTML = '<div class="option-empty">No staff accounts yet. Add one below.</div>';
+    return;
+  }
+  el.innerHTML = staff.map(s => `
+    <div class="staff-row" data-id="${s.id}">
+      <div>
+        <span class="uname">${escapeHtml(s.username)}</span>
+        <span class="pill ${s.active ? 'pill-active' : 'pill-inactive'}">${s.active ? 'Active' : 'Deactivated'}</span>
+      </div>
+      <div class="actions">
+        <button class="secondary staff-reset-btn" type="button">${icon('key-round',{size:14})} Reset Password</button>
+        <button class="secondary staff-toggle-btn" type="button">${s.active ? icon('user-x',{size:14}) : icon('user-check',{size:14})} ${s.active ? 'Deactivate' : 'Activate'}</button>
+        <button class="danger staff-delete-btn" type="button">${icon('trash-2',{size:14})} Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+document.getElementById('btnAddStaff').addEventListener('click', async ()=>{
+  const usernameEl = document.getElementById('newStaffUsername');
+  const passwordEl = document.getElementById('newStaffPassword');
+  const username = usernameEl.value.trim();
+  const password = passwordEl.value;
+  if(!username || !password){ alert('Username and password are required.'); return; }
+  try{
+    const res = await guardedFetch('/api/staff', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if(!res.ok){ alert(data.error || 'Could not add staff.'); return; }
+    usernameEl.value = '';
+    passwordEl.value = '';
+    loadStaff();
+  }catch(err){
+    console.error(err);
+    alert('Could not add staff: ' + err.message);
+  }
+});
+
+document.getElementById('staffRows').addEventListener('click', async (e)=>{
+  const row = e.target.closest('.staff-row');
+  if(!row) return;
+  const id = row.dataset.id;
+  const username = row.querySelector('.uname').textContent;
+
+  if(e.target.classList.contains('staff-reset-btn')){
+    const newPassword = prompt('New password for "' + username + '" (min 6 characters):');
+    if(!newPassword) return;
+    try{
+      const res = await guardedFetch('/api/staff/' + id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: newPassword })
+      });
+      const data = await res.json();
+      if(!res.ok){ alert(data.error || 'Could not reset password.'); return; }
+      alert('Password reset for "' + username + '".');
+    }catch(err){
+      console.error(err);
+      alert('Could not reset password: ' + err.message);
+    }
+    return;
+  }
+
+  if(e.target.classList.contains('staff-toggle-btn')){
+    const isActive = row.querySelector('.pill').classList.contains('pill-active');
+    try{
+      await guardedFetch('/api/staff/' + id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ active: !isActive })
+      });
+      loadStaff();
+    }catch(err){
+      console.error(err);
+      alert('Could not update account: ' + err.message);
+    }
+    return;
+  }
+
+  if(e.target.classList.contains('staff-delete-btn')){
+    if(!confirm('Delete staff account "' + username + '"? This cannot be undone.')) return;
+    try{
+      await guardedFetch('/api/staff/' + id, { method: 'DELETE' });
+      loadStaff();
+    }catch(err){
+      console.error(err);
+      alert('Could not delete account: ' + err.message);
+    }
+  }
+});
+
+/* ---------- Monitoring Officer Signatures ---------- */
+async function loadSignatures(){
+  const res = await guardedFetch('/api/officer-signatures');
+  const sigs = await res.json();
+  renderSignatures(sigs);
+}
+
+function renderSignatures(sigs){
+  const el = document.getElementById('sigRows');
+  if(sigs.length === 0){
+    el.innerHTML = '<div class="option-empty">No officer signatures uploaded yet.</div>';
+    return;
+  }
+  el.innerHTML = sigs.map(s => `
+    <div class="sig-row" data-name="${escapeHtml(s.officer_name)}">
+      <div class="sig-info">
+        <img class="sig-thumb" src="${escapeHtml(s.signature_data)}" alt="Signature of ${escapeHtml(s.officer_name)}">
+        <span class="sig-name">${escapeHtml(s.officer_name)}</span>
+      </div>
+      <button class="danger sig-delete-btn" type="button">${icon('trash-2',{size:14})} Delete</button>
+    </div>
+  `).join('');
+}
+
+document.getElementById('btnUploadSig').addEventListener('click', async ()=>{
+  const nameEl = document.getElementById('newSigOfficerName');
+  const fileEl = document.getElementById('newSigFile');
+  const officerName = nameEl.value.trim();
+  const file = fileEl.files[0];
+  if(!officerName || !file){ alert('Officer name and a signature image are required.'); return; }
+  if(!file.type.startsWith('image/')){ alert('Please choose an image file.'); return; }
+  try{
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    const res = await guardedFetch('/api/officer-signatures', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ officer_name: officerName, signature_data: dataUrl })
+    });
+    const data = await res.json();
+    if(!res.ok){ alert(data.error || 'Could not upload signature.'); return; }
+    nameEl.value = '';
+    fileEl.value = '';
+    loadSignatures();
+  }catch(err){
+    console.error(err);
+    alert('Could not upload signature: ' + err.message);
+  }
+});
+
+document.getElementById('sigRows').addEventListener('click', async (e)=>{
+  if(!e.target.classList.contains('sig-delete-btn')) return;
+  const row = e.target.closest('.sig-row');
+  const officerName = row.dataset.name;
+  if(!confirm('Delete signature for "' + officerName + '"?')) return;
+  try{
+    await guardedFetch('/api/officer-signatures/' + encodeURIComponent(officerName), { method: 'DELETE' });
+    loadSignatures();
+  }catch(err){
+    console.error(err);
+    alert('Could not delete signature: ' + err.message);
+  }
+});
+
+function renderOptionRows(card, values){
+  const rowsEl = card.querySelector('.option-rows');
+  if(values.length === 0){
+    rowsEl.innerHTML = '<div class="option-empty">No values yet. Add one below.</div>';
+    return;
+  }
+  rowsEl.innerHTML = values.map((v,i)=>`
+    <div class="option-row" data-idx="${i}">
+      <span>${escapeHtml(v)}</span>
+      <button class="danger option-remove-btn" type="button">${icon('trash-2',{size:14})} Remove</button>
+    </div>
+  `).join('');
+}
+
+function getCardValues(card){
+  return Array.from(card.querySelectorAll('.option-row span')).map(s=>s.textContent);
+}
+
+async function loadAll(){
+  const res = await guardedFetch('/api/options');
+  const opts = await res.json();
+  document.querySelectorAll('[data-admin-list]').forEach(card=>{
+    const key = card.dataset.adminList;
+    renderOptionRows(card, opts[key] || []);
+  });
+}
+loadAll();
+loadStaff();
+loadSignatures();
+
+document.querySelectorAll('[data-admin-list]').forEach(card=>{
+  const key = card.dataset.adminList;
+
+  card.querySelector('.option-add-btn').addEventListener('click', ()=>{
+    const input = card.querySelector('.option-new-value');
+    const v = input.value.trim();
+    if(!v) return;
+    const values = getCardValues(card);
+    if(values.includes(v)){ input.value=''; return; }
+    values.push(v);
+    renderOptionRows(card, values);
+    input.value = '';
+  });
+
+  card.querySelector('.option-rows').addEventListener('click', (e)=>{
+    if(!e.target.classList.contains('option-remove-btn')) return;
+    const values = getCardValues(card);
+    const idx = Number(e.target.closest('.option-row').dataset.idx);
+    values.splice(idx, 1);
+    renderOptionRows(card, values);
+  });
+
+  card.querySelector('.option-save-btn').addEventListener('click', async ()=>{
+    const values = getCardValues(card);
+    try{
+      const res = await guardedFetch('/api/options/' + key, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ values })
+      });
+      if(!res.ok) throw new Error('status ' + res.status);
+      alert('Saved.');
+    }catch(err){
+      console.error(err);
+      alert('Could not save list: ' + err.message);
+    }
+  });
+});
+
+document.getElementById('btnLogout').addEventListener('click', async ()=>{
+  await fetch('/api/admin/logout', { method: 'POST' });
+  window.location.href = '/';
+});
+</script>
+</body>
+</html>
