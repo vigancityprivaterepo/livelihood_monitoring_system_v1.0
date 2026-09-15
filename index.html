@@ -49,6 +49,7 @@
     gap:12px; flex-wrap:wrap;
   }
   header.appbar .appbar-left{display:flex; align-items:center; gap:12px; min-width:0;}
+  header.appbar .header-account{display:flex; align-items:center; gap:16px; font-size:12px; flex-wrap:wrap;}
   header.appbar .brand{display:flex; align-items:center; gap:12px; min-width:0;}
   header.appbar .brand img{height:38px; width:38px; flex-shrink:0;}
   header.appbar h1{font-size:17px; margin:0; font-weight:600;}
@@ -198,7 +199,7 @@
     nav.tabs.nav-open{display:flex;}
     nav.tabs .tab-btn{padding:12px; font-size:13px; width:100%; justify-content:flex-start; border-bottom:1px solid rgba(255,255,255,.08);}
     nav.tabs .tab-btn.active{border-bottom:1px solid rgba(255,255,255,.08); border-left:3px solid var(--accent); padding-left:9px;}
-    .header-account{display:none;}
+    header.appbar .header-account{display:none;}
     .nav-account-mobile{
       display:flex; flex-direction:column; margin-top:6px; padding-top:6px;
       border-top:1px solid rgba(255,255,255,.15);
@@ -245,7 +246,7 @@
     <h1>Livelihood Assistance Monitoring System</h1>
   </div>
   </div>
-  <div class="header-account" style="display:flex; align-items:center; gap:16px; font-size:12px; flex-wrap:wrap;">
+  <div class="header-account">
     <span id="whoami" class="whoami-text" style="opacity:.85;"></span>
     <a href="/admin" data-icon="shield-check" style="display:inline-flex; align-items:center; gap:5px; color:#cfd8e3; text-decoration:none;">Admin</a>
     <button id="btnLogout" class="btn-logout" data-icon="log-out" style="background:transparent; border:1px solid rgba(255,255,255,.5); color:#fff; padding:5px 11px; border-radius:5px; font-size:11.5px; cursor:pointer;">Log out</button>
