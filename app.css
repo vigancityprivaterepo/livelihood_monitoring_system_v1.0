@@ -62,7 +62,7 @@
 
   --tap:44px;                 /* minimum touch target */
   --sidebar:252px;
-  --content-max:1180px;
+  --content-max:1320px;
 }
 
 *{box-sizing:border-box;}
@@ -379,7 +379,7 @@ table.indicators input[type=text]{
 /* the form reads better as a narrower column than the dashboard/records
    width - on wide desktop screens content-max (1180px) stretched every
    input full-width and split the wizard-actions buttons far apart */
-#tab-form{max-width:840px;margin:0 auto;}
+#tab-form{max-width:960px;margin:0 auto;}
 
 .dash-head{
   display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;
@@ -569,7 +569,7 @@ table.doc-table td.chk{text-align:center;width:34px;}
 }
 
 @media (min-width:768px){
-  .grid2{grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:0 var(--s5);}
+  .grid2{grid-template-columns:1fr 1fr;gap:0 var(--s5);}
   .two-col{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:var(--s5);}
   .record-row{flex-direction:row;align-items:center;justify-content:space-between;gap:var(--s4);}
   .record-actions{flex-wrap:nowrap;}
