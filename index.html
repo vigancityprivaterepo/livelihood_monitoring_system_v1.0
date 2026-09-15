@@ -48,6 +48,7 @@
     background:var(--navy); color:#fff; padding:14px 24px; display:flex; align-items:center; justify-content:space-between;
     gap:12px; flex-wrap:wrap;
   }
+  header.appbar .appbar-left{display:flex; align-items:center; gap:12px; min-width:0;}
   header.appbar .brand{display:flex; align-items:center; gap:12px; min-width:0;}
   header.appbar .brand img{height:38px; width:38px; flex-shrink:0;}
   header.appbar h1{font-size:17px; margin:0; font-weight:600;}
@@ -230,15 +231,17 @@
 
 <div class="app-topbar">
 <header class="appbar">
+  <div class="appbar-left">
+  <button id="btnMenuToggle" class="menu-toggle" data-icon="menu" aria-label="Menu"></button>
   <div class="brand">
     <img src="/logo.png" alt="City of Vigan seal">
     <h1>Livelihood Assistance Monitoring System</h1>
+  </div>
   </div>
   <div style="display:flex; align-items:center; gap:16px; font-size:12px; flex-wrap:wrap;">
     <span id="whoami" style="opacity:.85;"></span>
     <a href="/admin" data-icon="shield-check" style="display:inline-flex; align-items:center; gap:5px; color:#cfd8e3; text-decoration:none;">Admin</a>
     <button id="btnLogout" data-icon="log-out" style="background:transparent; border:1px solid rgba(255,255,255,.5); color:#fff; padding:5px 11px; border-radius:5px; font-size:11.5px; cursor:pointer;">Log out</button>
-    <button id="btnMenuToggle" class="menu-toggle" data-icon="menu" aria-label="Menu"></button>
   </div>
 </header>
 <nav class="tabs" id="navTabs">
