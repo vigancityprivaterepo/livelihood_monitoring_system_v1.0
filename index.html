@@ -17,7 +17,10 @@
   <div class="appbar-left">
   <div class="brand">
     <img src="/logo.png" alt="City of Vigan seal">
-    <h1>Livelihood Assistance Monitoring System</h1>
+    <div class="brand-text">
+      <h1>Livelihood Assistance Monitoring</h1>
+      <p class="brand-sub">CSWDO &middot; City of Vigan</p>
+    </div>
   </div>
   </div>
   <div class="header-account">
@@ -28,13 +31,20 @@
 </header>
 <nav class="tabs" id="navTabs">
   <button class="tab-btn" data-tab="dashboard" data-icon="layout-dashboard">Dashboard</button>
-  <button class="tab-btn active" data-tab="form" data-icon="clipboard-list">Fill Up Form</button>
-  <button class="tab-btn" data-tab="records" data-icon="folder-open">Saved Records</button>
+  <button class="tab-btn active" data-tab="form" data-icon="clipboard-list">Fill Up Form<span class="nav-badge" id="navDraftBadge" hidden>Draft</span></button>
+  <button class="tab-btn" data-tab="records" data-icon="folder-open">Saved Records<span class="nav-badge" id="navRecordsBadge"></span></button>
   <button class="tab-btn" data-tab="preview" data-icon="printer">Preview &amp; Print</button>
   <div class="nav-account-mobile">
-    <div class="nav-whoami-row whoami-text"></div>
-    <a href="/admin" class="tab-btn" data-icon="shield-check">Admin</a>
-    <button class="tab-btn btn-logout" data-icon="log-out">Log out</button>
+    <a href="/admin" class="tab-btn" data-icon="shield-check">Admin settings</a>
+    <div class="nav-divider"></div>
+    <div class="nav-user-row">
+      <span class="nav-avatar" id="navAvatar"></span>
+      <div class="nav-user-info">
+        <span class="nav-user-name" id="navUserName"></span>
+        <span class="nav-user-role" id="navUserRole">Monitoring officer</span>
+      </div>
+      <button class="btn-logout" data-icon="log-out" aria-label="Log out"></button>
+    </div>
   </div>
 </nav>
 </div>
@@ -48,36 +58,45 @@
 <!-- ============ DASHBOARD TAB ============ -->
 <section id="tab-dashboard" style="display:none;">
 
+  <div class="dash-head">
+    <div>
+      <h1>Dashboard</h1>
+      <p id="dashSubtitle">Livelihood assistance across the city, updated as records are saved.</p>
+    </div>
+    <div class="dash-actions">
+      <button class="secondary" id="btnExportSummary" type="button" data-icon="download">Export summary</button>
+      <button class="primary" id="btnNewForm" type="button" data-icon="plus">New form</button>
+    </div>
+  </div>
+
   <div class="stat-grid" id="statGrid"></div>
 
   <div class="card">
-    <h2>Top Barangays &middot; Total Amount Granted</h2>
-    <p class="subtitle">Which barangay received the most livelihood assistance funding.</p>
-    <div class="hbar-list" id="chartBarangayAmount"></div>
-  </div>
-
-  <div class="card">
-    <h2>Top Barangays &middot; Number of Beneficiaries</h2>
-    <p class="subtitle">Which barangay has the most livelihood recipients.</p>
-    <div class="hbar-list" id="chartBarangayCount"></div>
-  </div>
-
-  <div class="card">
-    <h2>Assistance by Program</h2>
-    <p class="subtitle">Regular livelihood program vs. COVID LAG grants vs. LSG-OSBG / Cong. Ronald grants.</p>
-    <div class="hbar-list" id="chartProgram"></div>
-  </div>
-
-  <div class="card">
-    <div class="two-col">
-      <div>
-        <h2>Beneficiaries per Year</h2>
-        <div class="vbar-chart" id="chartYearCount"></div>
+    <div class="chart-head">
+      <div class="titles">
+        <h2>Assistance released per year</h2>
+        <p class="subtitle">Peso value released against the number of beneficiaries served.</p>
       </div>
-      <div>
-        <h2>Amount Granted per Year</h2>
-        <div class="vbar-chart" id="chartYearAmount"></div>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="dot" style="background:var(--series-1);"></span>Amount</span>
+        <span class="legend-item"><span class="dot" style="background:var(--series-2);"></span>Beneficiaries</span>
       </div>
+    </div>
+    <div class="vbar-chart grouped" id="chartYear"></div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <h2>Where the funding goes</h2>
+      <p class="subtitle">Top barangays by total amount granted.</p>
+      <div class="hbar-list" id="chartBarangayAmount"></div>
+    </div>
+
+    <div class="card">
+      <h2>Status of monitored businesses</h2>
+      <p class="subtitle" id="statusSubtitle">From monitoring visits that recorded a status.</p>
+      <div class="status-stack" id="statusStack"></div>
+      <div class="status-list" id="chartStatus"></div>
     </div>
   </div>
 
@@ -85,12 +104,6 @@
     <h2>Top Livelihood Projects / Assistance Types</h2>
     <p class="subtitle">Most common businesses and assistance types funded.</p>
     <div class="hbar-list" id="chartAssistanceType"></div>
-  </div>
-
-  <div class="card">
-    <h2>Current Status of Monitored Businesses</h2>
-    <p class="subtitle">From monitoring visits recorded through the form (historical records don't have this field).</p>
-    <div class="status-list" id="chartStatus"></div>
   </div>
 
 </section>
@@ -746,6 +759,7 @@ function showStep(n){
   document.getElementById('btnStepPrev').disabled = wzStep === 1;
   document.getElementById('btnStepNext').hidden = wzStep === WZ.length;
   document.getElementById('btnGenerate').hidden = wzStep !== WZ.length;
+  updateDraftBadge();
   window.scrollTo(0, 0);
 }
 document.getElementById('wzSteps').addEventListener('click', e=>{
@@ -786,6 +800,8 @@ document.getElementById('btnSaveRecord').addEventListener('click', async ()=>{
   try{
     const saved = await apiSaveRecord(data);
     activeRecordId = saved.id;
+    updateDraftBadge();
+    updateRecordsBadge(true);
     alert('Record saved to database.');
   }catch(err){
     if(err.status === 409 && err.conflicts && err.conflicts.length){
@@ -798,6 +814,8 @@ document.getElementById('btnSaveRecord').addEventListener('click', async ()=>{
         try{
           const saved = await apiSaveRecord({ ...data, overrideDuplicateCheck: true });
           activeRecordId = saved.id;
+          updateDraftBadge();
+          updateRecordsBadge(true);
           alert('Record saved to database.');
         }catch(err2){
           console.error(err2);
@@ -921,6 +939,7 @@ window.deleteRecord = async function(id){
     await apiDeleteRecord(id);
     records = records.filter(r=>r.id!==id);
     renderRecordsList();
+    document.getElementById('navRecordsBadge').textContent = fmtNum(records.length);
   }catch(err){
     console.error(err);
     alert('Could not delete record: ' + err.message);
@@ -1012,6 +1031,10 @@ loadOfficerSignatures();
 fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(d => {
   if(d && d.username){
     document.querySelectorAll('.whoami-text').forEach(el => el.textContent = 'Logged in as ' + d.username);
+    document.getElementById('navUserName').textContent = d.username;
+    document.getElementById('navUserRole').textContent = d.isAdmin ? 'Administrator' : 'Monitoring officer';
+    const initials = d.username.split(/[.\s_-]+/).filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('');
+    document.getElementById('navAvatar').textContent = initials || d.username.slice(0,2).toUpperCase();
   }
 }).catch(()=>{});
 
@@ -1073,23 +1096,33 @@ function renderHBarList(containerId, items, opts){
   });
 }
 
-function renderVBarChart(containerId, items, opts){
+function renderYearGroupedChart(containerId, items){
   const el = document.getElementById(containerId);
   if(!items || items.length === 0){ el.innerHTML = '<div class="empty">No data yet.</div>'; return; }
-  const valueOf = opts.valueOf;
-  const fmt = opts.fmt;
-  const max = Math.max(...items.map(valueOf), 1);
+  const maxAmount = Math.max(...items.map(d => d.amount), 1);
+  const maxCount = Math.max(...items.map(d => d.count), 1);
   el.innerHTML = '';
   items.forEach(item => {
-    const value = valueOf(item);
-    const pct = Math.max((value / max) * 100, 1.5);
+    const pctA = Math.max((item.amount / maxAmount) * 100, 1.5);
+    const pctB = Math.max((item.count / maxCount) * 100, 1.5);
     const col = document.createElement('div');
     col.className = 'vbar-col';
-    col.innerHTML = `<div class="vbar" style="height:${pct}%;"></div><div class="vlabel">${escapeHtml(item.key)}</div>`;
-    const bar = col.querySelector('.vbar');
-    bar.addEventListener('mouseenter', (e) => showDashTooltip(e, `${item.key}: ${fmt(value)}`));
-    bar.addEventListener('mousemove', moveDashTooltip);
-    bar.addEventListener('mouseleave', hideDashTooltip);
+    col.innerHTML = `
+      <div class="vlabel-value">${fmtPeso(item.amount)}</div>
+      <div class="vbar-pair">
+        <div class="vbar series-a" style="height:${pctA}%;"></div>
+        <div class="vbar series-b" style="height:${pctB}%;"></div>
+      </div>
+      <div class="vlabel">${escapeHtml(item.key)}</div>
+    `;
+    const barA = col.querySelector('.series-a');
+    const barB = col.querySelector('.series-b');
+    barA.addEventListener('mouseenter', (e) => showDashTooltip(e, `${item.key} amount: ${fmtPeso(item.amount)}`));
+    barA.addEventListener('mousemove', moveDashTooltip);
+    barA.addEventListener('mouseleave', hideDashTooltip);
+    barB.addEventListener('mouseenter', (e) => showDashTooltip(e, `${item.key} beneficiaries: ${fmtNum(item.count)}`));
+    barB.addEventListener('mousemove', moveDashTooltip);
+    barB.addEventListener('mouseleave', hideDashTooltip);
     el.appendChild(col);
   });
 }
@@ -1100,61 +1133,139 @@ const STATUS_COLOR = {
   'Temporarily Closed': 'var(--status-serious)',
   'Permanently Closed': 'var(--status-critical)'
 };
-const STATUS_ICON = {
-  'Operating Well': 'circle-check-big',
-  'Operating but Needs Assistance': 'triangle-alert',
-  'Temporarily Closed': 'circle-pause',
-  'Permanently Closed': 'circle-x'
-};
+const STILL_OPERATING_STATUSES = ['Operating Well', 'Operating but Needs Assistance'];
 
-function renderStatusList(containerId, items){
-  const el = document.getElementById(containerId);
-  if(!items || items.length === 0){ el.innerHTML = '<div class="empty">No monitoring visits recorded yet.</div>'; return; }
-  el.innerHTML = items.map(item => `
+function renderStatusStack(stackId, listId, items){
+  const stackEl = document.getElementById(stackId);
+  const listEl = document.getElementById(listId);
+  if(!items || items.length === 0){
+    stackEl.innerHTML = '';
+    listEl.innerHTML = '<div class="empty">No monitoring visits recorded yet.</div>';
+    return;
+  }
+  const total = items.reduce((sum, item) => sum + item.count, 0) || 1;
+  stackEl.innerHTML = items.map(item =>
+    `<span style="width:${(item.count / total * 100)}%; background:${STATUS_COLOR[item.key] || 'var(--viz-muted)'};" title="${escapeHtml(item.key)}"></span>`
+  ).join('');
+  listEl.innerHTML = items.map(item => `
     <div class="status-row">
-      <span class="status-icon" style="color:${STATUS_COLOR[item.key] || 'var(--viz-muted)'};">${icon(STATUS_ICON[item.key] || 'circle-pause', {size:18})}</span>
+      <span class="sdot" style="background:${STATUS_COLOR[item.key] || 'var(--viz-muted)'};"></span>
       <span class="slabel">${escapeHtml(item.key)}</span>
+      <span class="spct">${Math.round(item.count / total * 100)}%</span>
       <span class="scount">${fmtNum(item.count)}</span>
     </div>
   `).join('');
+  return total;
 }
+
+let lastDashboardData = null;
 
 async function loadDashboard(){
   const res = await fetch('/api/dashboard/summary');
   if(res.status === 401){ window.location.href = '/login'; return; }
   const data = await res.json();
+  lastDashboardData = data;
+
+  document.getElementById('dashSubtitle').textContent =
+    `Livelihood assistance across ${fmtNum(data.totals.barangayCount)} barangays, updated as records are saved.`;
+
+  const years = data.byYear.map(d => d.key);
+  const firstYear = years.length ? years[0] : '';
+  const statusTotal = data.byStatus.reduce((sum, s) => sum + s.count, 0);
+  const stillOperating = data.byStatus
+    .filter(s => STILL_OPERATING_STATUSES.includes(s.key))
+    .reduce((sum, s) => sum + s.count, 0);
+  const stillOperatingPct = statusTotal ? Math.round(stillOperating / statusTotal * 100) : 0;
 
   const statGrid = document.getElementById('statGrid');
   statGrid.innerHTML = `
-    <div class="stat-tile"><div class="label">${icon('clipboard-list',{size:13})} Total Records</div><div class="value">${fmtNum(data.totals.totalRecords)}</div></div>
-    <div class="stat-tile"><div class="label">${icon('users',{size:13})} Unique Beneficiaries</div><div class="value">${fmtNum(data.totals.uniqueBeneficiaries)}</div></div>
-    <div class="stat-tile"><div class="label">${icon('wallet',{size:13})} Total Amount Granted</div><div class="value">${fmtPeso(data.totals.totalAmount)}</div></div>
-    <div class="stat-tile"><div class="label">${icon('map-pin',{size:13})} Barangays Covered</div><div class="value">${fmtNum(data.totals.barangayCount)}</div></div>
-    <div class="stat-tile"><div class="label">${icon('layers',{size:13})} Programs</div><div class="value">${fmtNum(data.totals.programCount)}</div></div>
+    <div class="stat-tile stat-lead">
+      <div class="label">${icon('wallet',{size:13})} Total Amount Granted</div>
+      <div class="value">${fmtPeso(data.totals.totalAmount)}</div>
+      <div class="sub">Across ${fmtNum(data.totals.programCount)} programs${firstYear ? ' since ' + escapeHtml(firstYear) : ''}</div>
+    </div>
+    <div class="stat-tile">
+      <div class="label">${icon('users',{size:13})} Beneficiaries Reached</div>
+      <div class="value">${fmtNum(data.totals.uniqueBeneficiaries)}</div>
+      <div class="sub">${fmtNum(data.totals.totalRecords)} monitoring visits recorded</div>
+    </div>
+    <div class="stat-tile">
+      <div class="label">${icon('building-2',{size:13})} Still Operating</div>
+      <div class="value">${statusTotal ? stillOperatingPct + '%' : '&ndash;'}</div>
+      <div class="sub">${fmtNum(stillOperating)} of ${fmtNum(statusTotal)} visited</div>
+      <div class="seg-bar">${data.byStatus.map(s =>
+        `<span style="width:${statusTotal ? (s.count / statusTotal * 100) : 0}%; background:${STATUS_COLOR[s.key] || 'var(--viz-muted)'};"></span>`
+      ).join('')}</div>
+    </div>
   `;
 
+  renderYearGroupedChart('chartYear', data.byYear);
+
   const topByAmount = [...data.byBarangay].sort((a,b)=>b.amount-a.amount).slice(0,15);
-  const topByCount = [...data.byBarangay].sort((a,b)=>b.count-a.count).slice(0,15);
   renderHBarList('chartBarangayAmount', topByAmount, {
     valueOf: d => d.amount, fmt: fmtPeso, color: 'var(--series-1)',
     secondaryFmt: d => fmtNum(d.count) + ' beneficiaries'
-  });
-  renderHBarList('chartBarangayCount', topByCount, {
-    valueOf: d => d.count, fmt: fmtNum, color: 'var(--series-3)',
-    secondaryFmt: d => fmtPeso(d.amount)
-  });
-  renderHBarList('chartProgram', data.byProgram, {
-    valueOf: d => d.amount, fmt: fmtPeso, categorical: true,
-    secondaryFmt: d => fmtNum(d.count) + ' records'
   });
   renderHBarList('chartAssistanceType', data.byAssistanceType, {
     valueOf: d => d.count, fmt: fmtNum, color: 'var(--series-7)',
     secondaryFmt: d => fmtPeso(d.amount)
   });
-  renderVBarChart('chartYearCount', data.byYear, { valueOf: d => d.count, fmt: fmtNum });
-  renderVBarChart('chartYearAmount', data.byYear, { valueOf: d => d.amount, fmt: fmtPeso });
-  renderStatusList('chartStatus', data.byStatus);
+  renderStatusStack('statusStack', 'chartStatus', data.byStatus);
+  document.getElementById('statusSubtitle').textContent =
+    `From ${fmtNum(statusTotal)} monitoring visits that recorded a status.`;
+
+  updateRecordsBadge();
 }
+
+function exportDashboardSummary(){
+  if(!lastDashboardData){ return; }
+  const d = lastDashboardData;
+  const lines = [];
+  lines.push('Livelihood Assistance Monitoring - Dashboard Summary');
+  lines.push('Generated,' + new Date().toISOString());
+  lines.push('');
+  lines.push('Metric,Value');
+  lines.push('Total Amount Granted,' + d.totals.totalAmount);
+  lines.push('Beneficiaries Reached,' + d.totals.uniqueBeneficiaries);
+  lines.push('Total Monitoring Visits,' + d.totals.totalRecords);
+  lines.push('Barangays Covered,' + d.totals.barangayCount);
+  lines.push('Programs,' + d.totals.programCount);
+  lines.push('');
+  lines.push('Year,Amount,Beneficiaries');
+  d.byYear.forEach(y => lines.push(`${y.key},${y.amount},${y.count}`));
+  lines.push('');
+  lines.push('Barangay,Amount,Beneficiaries');
+  d.byBarangay.forEach(b => lines.push(`"${String(b.key).replace(/"/g,'""')}",${b.amount},${b.count}`));
+  lines.push('');
+  lines.push('Business Status,Count');
+  d.byStatus.forEach(s => lines.push(`"${String(s.key).replace(/"/g,'""')}",${s.count}`));
+
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'dashboard-summary.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+document.getElementById('btnExportSummary').addEventListener('click', exportDashboardSummary);
+document.getElementById('btnNewForm').addEventListener('click', ()=>{
+  clearForm();
+  switchTab('form');
+});
+
+/* ---------- Sidebar nav badges ---------- */
+function updateDraftBadge(){
+  document.getElementById('navDraftBadge').hidden = !!activeRecordId;
+}
+async function updateRecordsBadge(force){
+  try{
+    if(force || !records.length) await refreshRecords();
+    document.getElementById('navRecordsBadge').textContent = fmtNum(records.length);
+  }catch(err){ /* badge is cosmetic; ignore */ }
+}
+updateRecordsBadge();
 </script>
 </body>
 </html>

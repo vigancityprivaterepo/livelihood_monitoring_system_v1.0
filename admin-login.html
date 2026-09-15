@@ -12,19 +12,16 @@
 <body class="admin-auth">
   <form class="auth-card" id="loginForm">
     <div class="auth-seal" data-icon="shield-check"></div>
-    <h1>Admin Access</h1>
-    <p class="sub">Manage staff accounts &amp; dropdown values</p>
+    <h1>Admin sign-in</h1>
+    <p class="sub">Restricted to CSWDO system administrators.</p>
+    <input type="hidden" id="username" value="admin">
     <div class="field">
-      <label>Admin Username</label>
-      <input type="text" id="username" autofocus required autocomplete="username">
+      <label>Admin password</label>
+      <input type="password" id="password" autofocus required autocomplete="current-password">
     </div>
-    <div class="field">
-      <label>Admin Password</label>
-      <input type="password" id="password" required autocomplete="current-password">
-    </div>
-    <p class="error" id="err">Incorrect username or password.</p>
-    <button type="submit" data-icon="shield-check">Login</button>
-    <a class="auth-alt" href="/" data-icon="chevron-left">Back to app</a>
+    <p class="error" id="err">Incorrect password.</p>
+    <button type="submit" data-icon="shield-check">Continue</button>
+    <a class="auth-alt" href="/login">Back to staff login</a>
   </form>
 
 <script>

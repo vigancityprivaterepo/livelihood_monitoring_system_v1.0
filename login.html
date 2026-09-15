@@ -13,24 +13,25 @@
   <div class="auth">
     <div class="auth-brand">
       <img src="/logo.png" alt="City of Vigan seal">
-      <h1>Livelihood Assistance Monitoring System</h1>
-      <p>CSWDO &middot; City of Vigan</p>
-      <p class="auth-offline">Staff sign-in. Contact your administrator if you don't have an account.</p>
+      <h1>Livelihood Assistance Monitoring</h1>
+      <p>City Social Welfare and Development Office &middot; City of Vigan, Ilocos Sur</p>
+      <p class="auth-offline">Works offline on the office network.</p>
     </div>
     <div class="auth-panel">
       <form class="auth-form" id="loginForm">
-        <h2>Staff Login</h2>
-        <p class="sub">Sign in to continue to the monitoring form.</p>
+        <h2>Sign in</h2>
+        <p class="sub">Use the account Admin issued you.</p>
         <div class="field">
           <label>Username</label>
-          <input type="text" id="username" autofocus required autocomplete="username">
+          <input type="text" id="username" placeholder="cswdo.staff" autofocus required autocomplete="username">
         </div>
         <div class="field">
           <label>Password</label>
           <input type="password" id="password" required autocomplete="current-password">
         </div>
         <p class="error" id="err">Incorrect username or password.</p>
-        <button type="submit" data-icon="lock">Login</button>
+        <button type="submit" data-icon="lock">Log in</button>
+        <a class="auth-alt" href="/admin/login">Admin sign-in</a>
       </form>
     </div>
   </div>
