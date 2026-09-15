@@ -30,8 +30,8 @@
   </div>
 </header>
 <nav class="tabs" id="navTabs">
-  <button class="tab-btn" data-tab="dashboard" data-icon="layout-dashboard">Dashboard</button>
-  <button class="tab-btn active" data-tab="form" data-icon="clipboard-list">Fill Up Form<span class="nav-badge" id="navDraftBadge" hidden>Draft</span></button>
+  <button class="tab-btn active" data-tab="dashboard" data-icon="layout-dashboard">Dashboard</button>
+  <button class="tab-btn" data-tab="form" data-icon="clipboard-list">Fill Up Form<span class="nav-badge" id="navDraftBadge" hidden>Draft</span></button>
   <button class="tab-btn" data-tab="records" data-icon="folder-open">Saved Records<span class="nav-badge" id="navRecordsBadge"></span></button>
   <button class="tab-btn" data-tab="preview" data-icon="printer">Preview &amp; Print</button>
   <div class="nav-account-mobile">
@@ -56,7 +56,7 @@
 <main>
 
 <!-- ============ DASHBOARD TAB ============ -->
-<section id="tab-dashboard" style="display:none;">
+<section id="tab-dashboard">
 
   <div class="dash-head">
     <div>
@@ -109,7 +109,7 @@
 </section>
 
 <!-- ============ FORM TAB ============ -->
-<section id="tab-form">
+<section id="tab-form" style="display:none;">
 
 <div class="wizard-rail" id="wizardRail">
   <div class="wz-head">
@@ -370,7 +370,9 @@ async function refreshRecords(){
 document.querySelectorAll('.tab-btn[data-tab]').forEach(btn=>{
   btn.addEventListener('click', ()=> switchTab(btn.dataset.tab));
 });
-if(location.hash === '#dashboard') switchTab('dashboard');
+const VALID_TABS = ['dashboard', 'form', 'records', 'preview'];
+const initialTab = VALID_TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'dashboard';
+switchTab(initialTab);
 function switchTab(tab){
   document.querySelectorAll('.tab-btn[data-tab]').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
   ['dashboard','form','records','preview'].forEach(t=>{
