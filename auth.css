@@ -105,13 +105,13 @@ button[type=submit]:hover{background:var(--navy-dark);}
   .auth{flex-direction:row;}
   .auth-brand{
     flex:1;min-width:0;
-    flex-direction:column;align-items:flex-start;justify-content:space-between;
+    flex-direction:column;align-items:flex-start;justify-content:flex-start;
     padding:36px 32px;
   }
   .auth-brand img{width:52px;height:52px;}
   .auth-brand h1{font-size:21px;}
   .auth-brand p{font-size:13.5px;margin-top:10px;max-width:34ch;}
-  .auth-brand .auth-offline{display:block;font-size:11.5px;color:#8fbcac;}
+  .auth-brand .auth-offline{display:block;font-size:11.5px;color:#8fbcac;margin-top:auto;padding-top:24px;}
   .auth-panel{flex:1.1;min-width:0;padding:36px 32px;}
 }
 

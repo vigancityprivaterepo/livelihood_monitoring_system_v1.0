@@ -14,12 +14,15 @@
     <div class="auth-seal" data-icon="shield-check"></div>
     <h1>Admin sign-in</h1>
     <p class="sub">Restricted to CSWDO system administrators.</p>
-    <input type="hidden" id="username" value="admin">
+    <div class="field">
+      <label>Admin username</label>
+      <input type="text" id="username" autofocus required autocomplete="username">
+    </div>
     <div class="field">
       <label>Admin password</label>
-      <input type="password" id="password" autofocus required autocomplete="current-password">
+      <input type="password" id="password" required autocomplete="current-password">
     </div>
-    <p class="error" id="err">Incorrect password.</p>
+    <p class="error" id="err">Incorrect username or password.</p>
     <button type="submit" data-icon="shield-check">Continue</button>
     <a class="auth-alt" href="/login">Back to staff login</a>
   </form>
