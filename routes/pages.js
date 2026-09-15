@@ -15,6 +15,16 @@ router.get('/icons.js', (req, res) => {
   res.sendFile(path.join(ROOT, 'icons.js'));
 });
 
+router.get('/fonts/fonts.css', (req, res) => {
+  res.sendFile(path.join(ROOT, 'fonts', 'fonts.css'));
+});
+router.get('/fonts/:file', (req, res) => {
+  if(!/^[\w-]+\.woff2$/.test(req.params.file)) return res.status(404).json({ error: 'Not found' });
+  res.sendFile(path.join(ROOT, 'fonts', req.params.file), (err) => {
+    if(err && !res.headersSent) res.status(404).json({ error: 'Not found' });
+  });
+});
+
 router.get('/login', (req, res) => {
   if(getStaffSession(req) || isAdminSession(req)) return res.redirect('/');
   res.sendFile(path.join(ROOT, 'login.html'));
