@@ -60,6 +60,10 @@
     text-decoration:none; display:inline-block; font-family:inherit; white-space:nowrap; flex-shrink:0;
   }
   nav.tabs .tab-btn.active{color:#fff; border-bottom:3px solid var(--accent); font-weight:600;}
+  .menu-toggle{
+    display:none; background:transparent; border:1px solid rgba(255,255,255,.5); color:#fff;
+    padding:6px 9px; border-radius:5px; cursor:pointer;
+  }
   main{max-width:960px; margin:24px auto; padding:0 16px 60px;}
   .card{background:var(--card); border:1px solid var(--border); border-radius:8px; padding:22px 26px; margin-bottom:20px; box-shadow:0 1px 2px rgba(15,23,28,.05), 0 1px 8px rgba(15,23,28,.04);}
   .card h2{font-size:17px; font-weight:700; color:var(--text); margin:0 0 16px; padding-left:12px; border-left:4px solid var(--navy);}
@@ -184,8 +188,14 @@
     header.appbar{padding:12px 16px;}
     header.appbar h1{font-size:14.5px;}
     header.appbar .brand img{height:32px; width:32px;}
-    nav.tabs{padding:0 8px;}
-    nav.tabs .tab-btn{padding:11px 12px; font-size:12.5px;}
+    .menu-toggle{display:inline-flex;}
+    nav.tabs{
+      display:none; flex-direction:column; padding:6px 8px; gap:0;
+      overflow-x:visible;
+    }
+    nav.tabs.nav-open{display:flex;}
+    nav.tabs .tab-btn{padding:12px; font-size:13px; width:100%; justify-content:flex-start; border-bottom:1px solid rgba(255,255,255,.08);}
+    nav.tabs .tab-btn.active{border-bottom:1px solid rgba(255,255,255,.08); border-left:3px solid var(--accent); padding-left:9px;}
     main{padding:0 12px 40px; margin:16px auto;}
     .card{padding:16px 16px;}
 
@@ -228,9 +238,10 @@
     <span id="whoami" style="opacity:.85;"></span>
     <a href="/admin" data-icon="shield-check" style="display:inline-flex; align-items:center; gap:5px; color:#cfd8e3; text-decoration:none;">Admin</a>
     <button id="btnLogout" data-icon="log-out" style="background:transparent; border:1px solid rgba(255,255,255,.5); color:#fff; padding:5px 11px; border-radius:5px; font-size:11.5px; cursor:pointer;">Log out</button>
+    <button id="btnMenuToggle" class="menu-toggle" data-icon="menu" aria-label="Menu"></button>
   </div>
 </header>
-<nav class="tabs">
+<nav class="tabs" id="navTabs">
   <button class="tab-btn" data-tab="dashboard" data-icon="layout-dashboard">Dashboard</button>
   <button class="tab-btn active" data-tab="form" data-icon="clipboard-list">Fill Up Form</button>
   <button class="tab-btn" data-tab="records" data-icon="folder-open">Saved Records</button>
@@ -533,9 +544,23 @@ async function refreshRecords(){
   }
 }
 
+/* ---------- Mobile hamburger menu ---------- */
+const navTabs = document.getElementById('navTabs');
+const btnMenuToggle = document.getElementById('btnMenuToggle');
+btnMenuToggle.addEventListener('click', ()=>{
+  const open = navTabs.classList.toggle('nav-open');
+  btnMenuToggle.innerHTML = '';
+  btnMenuToggle.insertAdjacentHTML('afterbegin', icon(open ? 'x' : 'menu', {size:16}));
+});
+
 /* ---------- Tab switching ---------- */
 document.querySelectorAll('.tab-btn[data-tab]').forEach(btn=>{
-  btn.addEventListener('click', ()=> switchTab(btn.dataset.tab));
+  btn.addEventListener('click', ()=>{
+    switchTab(btn.dataset.tab);
+    navTabs.classList.remove('nav-open');
+    btnMenuToggle.innerHTML = '';
+    btnMenuToggle.insertAdjacentHTML('afterbegin', icon('menu', {size:16}));
+  });
 });
 if(location.hash === '#dashboard') switchTab('dashboard');
 function switchTab(tab){
