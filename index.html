@@ -65,6 +65,7 @@
     display:none; background:transparent; border:1px solid rgba(255,255,255,.5); color:#fff;
     padding:6px 9px; border-radius:5px; cursor:pointer;
   }
+  .nav-account-mobile{display:none;}
   main{max-width:960px; margin:24px auto; padding:0 16px 60px;}
   .card{background:var(--card); border:1px solid var(--border); border-radius:8px; padding:22px 26px; margin-bottom:20px; box-shadow:0 1px 2px rgba(15,23,28,.05), 0 1px 8px rgba(15,23,28,.04);}
   .card h2{font-size:17px; font-weight:700; color:var(--text); margin:0 0 16px; padding-left:12px; border-left:4px solid var(--navy);}
@@ -197,6 +198,12 @@
     nav.tabs.nav-open{display:flex;}
     nav.tabs .tab-btn{padding:12px; font-size:13px; width:100%; justify-content:flex-start; border-bottom:1px solid rgba(255,255,255,.08);}
     nav.tabs .tab-btn.active{border-bottom:1px solid rgba(255,255,255,.08); border-left:3px solid var(--accent); padding-left:9px;}
+    .header-account{display:none;}
+    .nav-account-mobile{
+      display:flex; flex-direction:column; margin-top:6px; padding-top:6px;
+      border-top:1px solid rgba(255,255,255,.15);
+    }
+    .nav-whoami-row{padding:10px 12px; font-size:12px; color:#cfd8e3;}
     main{padding:0 12px 40px; margin:16px auto;}
     .card{padding:16px 16px;}
 
@@ -238,10 +245,10 @@
     <h1>Livelihood Assistance Monitoring System</h1>
   </div>
   </div>
-  <div style="display:flex; align-items:center; gap:16px; font-size:12px; flex-wrap:wrap;">
-    <span id="whoami" style="opacity:.85;"></span>
+  <div class="header-account" style="display:flex; align-items:center; gap:16px; font-size:12px; flex-wrap:wrap;">
+    <span id="whoami" class="whoami-text" style="opacity:.85;"></span>
     <a href="/admin" data-icon="shield-check" style="display:inline-flex; align-items:center; gap:5px; color:#cfd8e3; text-decoration:none;">Admin</a>
-    <button id="btnLogout" data-icon="log-out" style="background:transparent; border:1px solid rgba(255,255,255,.5); color:#fff; padding:5px 11px; border-radius:5px; font-size:11.5px; cursor:pointer;">Log out</button>
+    <button id="btnLogout" class="btn-logout" data-icon="log-out" style="background:transparent; border:1px solid rgba(255,255,255,.5); color:#fff; padding:5px 11px; border-radius:5px; font-size:11.5px; cursor:pointer;">Log out</button>
   </div>
 </header>
 <nav class="tabs" id="navTabs">
@@ -249,6 +256,11 @@
   <button class="tab-btn active" data-tab="form" data-icon="clipboard-list">Fill Up Form</button>
   <button class="tab-btn" data-tab="records" data-icon="folder-open">Saved Records</button>
   <button class="tab-btn" data-tab="preview" data-icon="printer">Preview &amp; Print</button>
+  <div class="nav-account-mobile">
+    <div class="nav-whoami-row whoami-text"></div>
+    <a href="/admin" class="tab-btn" data-icon="shield-check">Admin</a>
+    <button class="tab-btn btn-logout" data-icon="log-out">Log out</button>
+  </div>
 </nav>
 </div>
 
@@ -1130,16 +1142,18 @@ async function loadOfficerSignatures(){
 loadOfficerSignatures();
 
 fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(d => {
-  if(d && d.username) document.getElementById('whoami').textContent = 'Logged in as ' + d.username;
+  if(d && d.username){
+    document.querySelectorAll('.whoami-text').forEach(el => el.textContent = 'Logged in as ' + d.username);
+  }
 }).catch(()=>{});
 
-document.getElementById('btnLogout').addEventListener('click', async ()=>{
+document.querySelectorAll('.btn-logout').forEach(btn => btn.addEventListener('click', async ()=>{
   await Promise.all([
     fetch('/api/auth/logout', { method: 'POST' }),
     fetch('/api/admin/logout', { method: 'POST' })
   ]);
   window.location.href = '/login';
-});
+}));
 
 /* ---------- Dashboard ---------- */
 const dashTooltip = document.getElementById('dashTooltip');
