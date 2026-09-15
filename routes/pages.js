@@ -18,6 +18,16 @@ router.get('/icons.js', (req, res) => {
 router.get('/fonts/fonts.css', (req, res) => {
   res.sendFile(path.join(ROOT, 'fonts', 'fonts.css'));
 });
+
+router.get('/app.css', (req, res) => {
+  res.sendFile(path.join(ROOT, 'app.css'));
+});
+router.get('/auth.css', (req, res) => {
+  res.sendFile(path.join(ROOT, 'auth.css'));
+});
+router.get('/admin.css', (req, res) => {
+  res.sendFile(path.join(ROOT, 'admin.css'));
+});
 router.get('/fonts/:file', (req, res) => {
   if(!/^[\w-]+\.woff2$/.test(req.params.file)) return res.status(404).json({ error: 'Not found' });
   res.sendFile(path.join(ROOT, 'fonts', req.params.file), (err) => {

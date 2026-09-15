@@ -7,48 +7,33 @@
 <link rel="icon" type="image/png" href="/logo.png">
 <script src="/icons.js"></script>
 <link rel="stylesheet" href="/fonts/fonts.css">
-<style>
-  :root{ --navy:#047857; --navy-dark:#065f46; --accent:#c0392b; --bg:#e9edf0; --border:#b9c2c9; --muted:#48525c; }
-  *{box-sizing:border-box;}
-  body{
-    margin:0; min-height:100vh; padding:20px; display:flex; align-items:center; justify-content:center;
-    font-family:'Inter','Segoe UI',Arial,sans-serif; background:var(--bg);
-  }
-  .card{
-    background:#fff; border:1px solid var(--border); border-radius:10px; padding:32px 30px;
-    width:100%; max-width:340px; box-shadow:0 4px 18px rgba(0,0,0,.08); text-align:center;
-  }
-  .card img{height:60px; width:60px; margin-bottom:10px;}
-  .card h1{font-size:16px; color:var(--navy); margin:0 0 4px;}
-  .card .sub{font-size:12px; color:var(--muted); margin:0 0 22px;}
-  .field{text-align:left; margin-bottom:16px;}
-  .field label{display:block; font-size:12.5px; font-weight:600; color:var(--muted); margin-bottom:5px;}
-  .field input{width:100%; padding:10px 11px; border:1px solid var(--border); border-radius:6px; font-size:14px;}
-  button{
-    width:100%; background:var(--navy); color:#fff; border:none; padding:11px; border-radius:6px;
-    font-size:14px; font-weight:600; cursor:pointer;
-    display:inline-flex; align-items:center; justify-content:center; gap:7px;
-  }
-  button:hover{background:var(--navy-dark);}
-  .error{color:var(--accent); font-size:12.5px; margin:-6px 0 14px; display:none;}
-</style>
+<link rel="stylesheet" href="/auth.css">
 </head>
 <body>
-  <form class="card" id="loginForm">
-    <img src="/logo.png" alt="City of Vigan seal">
-    <h1>Livelihood Assistance Monitoring System</h1>
-    <p class="sub">CSWDO &middot; City of Vigan</p>
-    <div class="field">
-      <label>Username</label>
-      <input type="text" id="username" autofocus required autocomplete="username">
+  <div class="auth">
+    <div class="auth-brand">
+      <img src="/logo.png" alt="City of Vigan seal">
+      <h1>Livelihood Assistance Monitoring System</h1>
+      <p>CSWDO &middot; City of Vigan</p>
+      <p class="auth-offline">Staff sign-in. Contact your administrator if you don't have an account.</p>
     </div>
-    <div class="field">
-      <label>Password</label>
-      <input type="password" id="password" required autocomplete="current-password">
+    <div class="auth-panel">
+      <form class="auth-form" id="loginForm">
+        <h2>Staff Login</h2>
+        <p class="sub">Sign in to continue to the monitoring form.</p>
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="username" autofocus required autocomplete="username">
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="password" required autocomplete="current-password">
+        </div>
+        <p class="error" id="err">Incorrect username or password.</p>
+        <button type="submit" data-icon="lock">Login</button>
+      </form>
     </div>
-    <p class="error" id="err">Incorrect username or password.</p>
-    <button type="submit" data-icon="lock">Login</button>
-  </form>
+  </div>
 
 <script>
 document.querySelectorAll('[data-icon]').forEach(el=>{

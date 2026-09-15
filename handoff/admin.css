@@ -1,0 +1,174 @@
+/* ===========================================================================
+   Livelihood Assistance Monitoring System — admin stylesheet (admin.html)
+   Replaces the <style> block in admin.html. Mobile-first, no CDN.
+   All IDs/classes queried by admin.html's JS are preserved:
+   .staff-row .uname .pill .staff-reset-btn .staff-toggle-btn .staff-delete-btn
+   .sig-row .sig-info .sig-thumb .sig-name .sig-delete-btn
+   .option-row .option-rows .option-new-value .option-add-btn .option-save-btn
+   =========================================================================== */
+
+:root{
+  --navy:#047857;
+  --navy-dark:#065f46;
+  --navy-tint:#e7f3ee;
+  --accent:#c0392b;
+  --accent-dark:#a32d20;
+  --accent-tint:#fbeae8;
+  --bg:#f1f4f2;
+  --card:#ffffff;
+  --card-sunken:#fbfcfb;
+  --border:#dbe3df;
+  --border-strong:#c3ceca;
+  --text:#101a17;
+  --text-2:#33433d;
+  --muted:#475a53;
+  --faint:#6b7d76;
+  --on-navy-soft:#cfe3da;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s7:32px;
+  --r-sm:8px; --r-md:10px; --r-lg:12px; --r-pill:999px;
+  --shadow-2:0 1px 2px rgba(16,26,23,.05), 0 8px 24px rgba(16,26,23,.04);
+  --tap:44px;
+}
+
+*{box-sizing:border-box;}
+
+body{
+  margin:0;
+  font-family:'Inter','Segoe UI',Arial,sans-serif;
+  font-size:14px;line-height:1.5;
+  background:var(--bg);color:var(--text);
+}
+a{color:var(--on-navy-soft);text-decoration:none;}
+a:hover{color:#fff;text-decoration:underline;}
+input,button{font-family:inherit;font-size:inherit;}
+:focus-visible{outline:2px solid var(--navy);outline-offset:2px;}
+
+/* ------------------------------------------------------------------ appbar --*/
+header.appbar{
+  position:sticky;top:0;z-index:100;
+  background:var(--navy-dark);color:#fff;
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s3);
+  padding:10px var(--s4);
+}
+header.appbar .brand{display:flex;align-items:center;gap:var(--s3);min-width:0;}
+header.appbar .brand img{height:30px;width:30px;flex-shrink:0;}
+header.appbar h1{font-size:15px;font-weight:700;margin:0;}
+header.appbar .right{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2);font-size:12.5px;}
+header.appbar .right a,
+header.appbar button{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  min-height:40px;padding:0 var(--s3);
+  border:1px solid rgba(255,255,255,.32);border-radius:var(--r-sm);
+  background:transparent;color:#fff;font-size:12.5px;font-weight:600;cursor:pointer;
+}
+header.appbar .right a:hover,
+header.appbar button:hover{background:rgba(255,255,255,.12);text-decoration:none;}
+
+main{
+  width:100%;max-width:880px;margin:0 auto;
+  padding:var(--s4) var(--s3) var(--s7);
+}
+
+/* -------------------------------------------------------------------- card --*/
+.card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:var(--s4);margin-bottom:var(--s4);box-shadow:var(--shadow-2);
+}
+.card h2{
+  font-size:16px;font-weight:700;color:var(--text);
+  margin:0 0 var(--s1);padding:0;border:none;letter-spacing:-.01em;
+}
+.hint{font-size:13px;color:var(--muted);margin:0 0 var(--s4);}
+
+/* ----------------------------------------------------------------- buttons --*/
+button.primary,button.secondary,button.danger{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  min-height:var(--tap);padding:0 var(--s4);
+  border-radius:var(--r-sm);font-size:13.5px;font-weight:600;cursor:pointer;
+}
+button.primary{background:var(--navy);color:#fff;border:1px solid var(--navy);font-weight:700;}
+button.primary:hover{background:var(--navy-dark);border-color:var(--navy-dark);}
+button.secondary{background:var(--card);color:var(--navy-dark);border:1px solid var(--border-strong);}
+button.secondary:hover{background:var(--navy-tint);}
+button.danger{background:var(--card);color:var(--accent-dark);border:1px solid #e6c8c3;padding:0 var(--s3);}
+button.danger:hover{background:var(--accent-tint);}
+.lucide-icon{flex-shrink:0;}
+
+/* ------------------------------------------------------------------- rows ---*/
+.staff-row,
+.sig-row,
+.option-row{
+  display:flex;flex-direction:column;align-items:flex-start;gap:var(--s3);
+  padding:var(--s3);margin-bottom:var(--s2);
+  border:1px solid var(--border);border-radius:var(--r-md);
+  font-size:14px;
+}
+.staff-row:last-child,
+.sig-row:last-child,
+.option-row:last-child{margin-bottom:0;}
+
+.staff-row .uname,
+.sig-row .sig-name{font-weight:700;color:var(--text);font-size:15px;}
+.staff-row .actions,
+.sig-row .sig-delete-btn{display:flex;flex-wrap:wrap;gap:var(--s2);width:100%;}
+.staff-row .actions button{flex:1 1 42%;}
+.sig-row .sig-info{display:flex;align-items:center;gap:var(--s3);width:100%;min-width:0;}
+.sig-row .sig-thumb{
+  height:46px;max-width:150px;flex-shrink:0;
+  background:var(--card-sunken);border:1px solid var(--border);border-radius:6px;padding:3px;
+}
+
+.option-empty{color:var(--muted);font-size:13px;padding:var(--s2) 0;}
+
+.pill{
+  display:inline-flex;align-items:center;
+  padding:4px 11px;border-radius:var(--r-pill);
+  font-size:11.5px;font-weight:700;white-space:nowrap;
+}
+.pill-active{background:#e4f6ea;color:#0f6b34;}
+.pill-inactive{background:#f1f2f2;color:#4a5450;}
+
+/* ------------------------------------------------------------- input rows ---*/
+.btnrow{
+  display:flex;flex-wrap:wrap;gap:var(--s2);
+  margin-top:var(--s4);padding-top:var(--s4);border-top:1px solid var(--border);
+}
+.card[data-admin-list] .btnrow{border-top:none;padding-top:0;}
+.btnrow input[type=text],
+.btnrow input[type=password]{
+  flex:1 1 100%;min-width:0;min-height:var(--tap);padding:0 var(--s3);
+  border:1px solid var(--border-strong);border-radius:var(--r-sm);
+  background:#fff;color:var(--text);font-size:14px;
+}
+.btnrow input[type=file]{
+  flex:1 1 100%;min-height:var(--tap);padding:10px var(--s3);
+  border:1.5px dashed var(--border-strong);border-radius:var(--r-sm);
+  background:var(--card-sunken);font-size:13px;color:var(--text-2);
+}
+.btnrow input:focus{border-color:var(--navy);}
+.btnrow button{flex:1 1 100%;}
+
+@media (min-width:560px){
+  main{padding-left:var(--s4);padding-right:var(--s4);}
+  .card{padding:var(--s5) var(--s6);}
+  .staff-row,
+  .sig-row,
+  .option-row{flex-direction:row;align-items:center;justify-content:space-between;}
+  .staff-row .actions,
+  .sig-row .sig-delete-btn{width:auto;flex-wrap:nowrap;}
+  .staff-row .actions button{flex:0 0 auto;}
+  .sig-row .sig-info{width:auto;flex:1;}
+  .btnrow input[type=text],
+  .btnrow input[type=password]{flex:1 1 200px;}
+  .btnrow input[type=file]{flex:1 1 220px;}
+  .btnrow button{flex:0 0 auto;}
+}
+
+@media (min-width:1024px){
+  main{padding:var(--s6) var(--s4) var(--s7);}
+  .card{padding:var(--s6) var(--s7);}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important;animation:none !important;}
+}

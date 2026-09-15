@@ -1,0 +1,646 @@
+/* ===========================================================================
+   Livelihood Assistance Monitoring System — app stylesheet (index.html)
+   CSWDO, City of Vigan.
+
+   Mobile-first. Tested at 320 / 375 / 768 / 1024 / 1440px.
+   No external fonts, no CDN, no build step. Inter + icons stay self-hosted.
+   Every selector the existing JS queries is preserved; new selectors are
+   additive (see handoff/README.md for the required HTML/JS edits).
+   =========================================================================== */
+
+/* ---------------------------------------------------------------- tokens -- */
+:root{
+  /* institutional palette — kept, extended (not replaced) */
+  --navy:#047857;            /* primary (emerald, as in v1.0) */
+  --navy-dark:#065f46;        /* primary hover / chrome */
+  --navy-deep:#0c3d2e;        /* deepest chrome, admin login backdrop */
+  --navy-tint:#e7f3ee;        /* primary wash for selected states */
+  --navy-tint-strong:#cfe6dd;
+  --on-navy:#ffffff;
+  --on-navy-soft:#cfe3da;     /* 7.0:1 on --navy-dark */
+  --on-navy-faint:#a9cfc1;    /* 5.2:1 on --navy-dark, labels only */
+
+  --accent:#c0392b;
+  --accent-dark:#a32d20;      /* AA text on white (5.3:1) */
+  --accent-tint:#fbeae8;
+
+  /* surfaces */
+  --bg:#f1f4f2;
+  --card:#ffffff;
+  --card-sunken:#fbfcfb;
+  --border:#dbe3df;
+  --border-strong:#c3ceca;
+
+  /* ink — WCAG AA fixed: old --muted #48525c on light surfaces was borderline
+     for 12px text, so small text now uses --text-2, and --muted is reserved
+     for >=14px / non-essential text. */
+  --text:#101a17;             /* 16.1:1 on --card */
+  --text-2:#33433d;           /* 10.2:1 — small labels */
+  --muted:#475a53;            /*  7.6:1 — secondary copy */
+  --faint:#6b7d76;            /*  4.6:1 — hints, 13px+ only */
+
+  /* data viz */
+  --viz-grid:#eaeeec;
+  --viz-baseline:#c3ceca;
+  --series-1:#047857;
+  --series-2:#9dbcb0;
+  --series-3:#2a78d6;
+  --series-4:#eda100;
+  --status-good:#047857;
+  --status-warning:#eda100;
+  --status-serious:#e08a5a;
+  --status-critical:#c0392b;
+
+  /* rhythm — one 4px scale, used everywhere */
+  --s1:4px;  --s2:8px;  --s3:12px; --s4:16px;
+  --s5:20px; --s6:24px; --s7:32px; --s8:48px;
+
+  --r-sm:8px; --r-md:10px; --r-lg:12px; --r-pill:999px;
+  --shadow-1:0 1px 2px rgba(16,26,23,.05);
+  --shadow-2:0 1px 2px rgba(16,26,23,.05), 0 8px 24px rgba(16,26,23,.04);
+  --shadow-3:0 -2px 12px rgba(16,26,23,.06);
+
+  --tap:44px;                 /* minimum touch target */
+  --sidebar:252px;
+  --content-max:1180px;
+}
+
+*{box-sizing:border-box;}
+
+html{-webkit-text-size-adjust:100%;}
+
+body{
+  margin:0;
+  font-family:'Inter','Segoe UI',Arial,sans-serif;
+  font-size:14px;
+  line-height:1.5;
+  background:var(--bg);
+  color:var(--text);
+}
+
+a{color:var(--navy);text-decoration:none;}
+a:hover{color:var(--navy-dark);text-decoration:underline;}
+header.appbar a{color:var(--on-navy-soft);}
+header.appbar a:hover{color:#fff;}
+
+h1,h2,h3,h4{text-wrap:pretty;}
+
+input,textarea,select,button{font-family:inherit;font-size:inherit;}
+::placeholder{color:var(--faint);}
+
+:focus-visible{outline:2px solid var(--navy);outline-offset:2px;}
+
+/* =============================================================== app shell ==
+   Mobile: sticky top bar + bottom tab bar.
+   >=1024px: fixed left sidebar (nav.tabs moves inside <aside>).
+   ========================================================================== */
+.app-shell{display:flex;flex-direction:column;min-height:100vh;}
+
+.app-topbar{position:sticky;top:0;z-index:100;}
+
+header.appbar{
+  background:var(--navy-dark);
+  color:var(--on-navy);
+  display:flex;align-items:center;gap:var(--s3);
+  padding:10px var(--s4);
+}
+header.appbar .appbar-left{display:flex;align-items:center;gap:var(--s3);min-width:0;flex:1;}
+header.appbar .brand{display:flex;align-items:center;gap:var(--s3);min-width:0;}
+header.appbar .brand img{height:30px;width:30px;flex-shrink:0;}
+header.appbar h1{
+  font-size:14px;font-weight:700;margin:0;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+header.appbar .header-account{display:flex;align-items:center;gap:var(--s3);font-size:12.5px;}
+header.appbar .whoami-text{color:var(--on-navy-faint);}
+
+/* icon-only chrome buttons: square, 40px, always tappable */
+header.appbar .btn-logout,
+.menu-toggle{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  min-height:40px;min-width:40px;padding:0 10px;
+  background:transparent;border:1px solid rgba(255,255,255,.32);
+  border-radius:var(--r-sm);color:var(--on-navy);cursor:pointer;
+  font-size:12px;font-weight:600;
+}
+header.appbar .btn-logout:hover,
+.menu-toggle:hover{background:rgba(255,255,255,.12);}
+
+/* --- mobile bottom tab bar (nav.tabs) ------------------------------------- */
+nav.tabs{
+  position:fixed;left:0;right:0;bottom:0;z-index:100;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  background:var(--card);border-top:1px solid var(--border);
+  box-shadow:var(--shadow-3);
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
+nav.tabs .tab-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  min-height:60px;padding:var(--s2) var(--s1);
+  background:transparent;border:none;cursor:pointer;
+  color:var(--faint);font-size:10.5px;font-weight:700;line-height:1.2;
+  text-align:center;text-decoration:none;
+}
+nav.tabs .tab-btn.active{color:var(--navy);}
+nav.tabs .tab-btn .lucide-icon{flex-shrink:0;}
+
+/* account links live in the top bar on mobile, not the tab bar */
+.nav-account-mobile{display:none;}
+nav.tabs .tab-btn[href="/admin"],
+nav.tabs .tab-btn.btn-logout{display:none;}
+
+main{
+  flex:1;
+  width:100%;max-width:var(--content-max);margin:0 auto;
+  padding:var(--s4) var(--s3) calc(76px + var(--s6));   /* room for tab bar */
+}
+
+/* ==================================================================== card ==*/
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);
+  padding:var(--s4);
+  margin-bottom:var(--s4);
+  box-shadow:var(--shadow-2);
+}
+.card h2{
+  font-size:16px;font-weight:700;color:var(--text);
+  margin:0 0 var(--s1);padding:0;border:none;           /* left rule dropped */
+  letter-spacing:-.01em;
+}
+.card .subtitle,
+.card > .hint:first-of-type{margin-top:0;}
+.card .subtitle{font-size:13px;color:var(--muted);margin:0 0 var(--s4);}
+.hint{font-size:13px;color:var(--muted);margin:var(--s2) 0 var(--s4);}
+
+/* section grouping for the long form: a quiet eyebrow instead of 10 identical
+   cards fighting for attention */
+.card-eyebrow{
+  display:block;font-size:11px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:var(--s1);
+}
+
+/* ================================================================== fields ==*/
+.field{margin-bottom:var(--s4);}
+.field label,
+.field > span{display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px;}
+.field input[type=text],
+.field input[type=date],
+.field input[type=number],
+.field input[type=password],
+.field textarea,
+.filter-bar .field input{
+  width:100%;
+  min-height:var(--tap);
+  padding:0 var(--s3);
+  border:1px solid var(--border-strong);
+  border-radius:var(--r-sm);
+  background:var(--card);
+  color:var(--text);
+  font-size:14px;                 /* >=16px would stop iOS zoom; see README */
+}
+.field textarea{min-height:96px;padding:11px var(--s3);resize:vertical;line-height:1.55;}
+.field input:focus,
+.field textarea:focus{border-color:var(--navy);outline:2px solid var(--navy-tint-strong);outline-offset:0;}
+
+.grid2{display:grid;grid-template-columns:1fr;gap:0 var(--s5);}
+.checkbox-grid{display:grid;grid-template-columns:1fr;gap:var(--s2);margin-top:var(--s2);}
+
+/* checkbox / radio rows become real tap targets */
+.checkbox-grid label,
+.radio-list label{
+  display:flex;align-items:center;gap:11px;
+  min-height:48px;padding:0 var(--s3);
+  border:1.5px solid var(--border);border-radius:var(--r-md);
+  background:var(--card);
+  font-size:13.5px;font-weight:600;color:var(--text);cursor:pointer;
+}
+.checkbox-grid label:has(input:checked),
+.radio-list label:has(input:checked){border-color:var(--navy);background:var(--navy-tint);}
+.checkbox-grid input,
+.radio-list input{width:18px;height:18px;accent-color:var(--navy);flex-shrink:0;}
+.radio-list{display:flex;flex-direction:column;gap:var(--s2);margin-top:var(--s2);}
+
+/* ================================================================= buttons ==*/
+button.primary,button.secondary,button.danger,.btn-icon{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  min-height:var(--tap);padding:0 18px;
+  border-radius:var(--r-sm);font-size:14px;font-weight:600;cursor:pointer;
+}
+button.primary{background:var(--navy);color:#fff;border:1px solid var(--navy);font-weight:700;}
+button.primary:hover{background:var(--navy-dark);border-color:var(--navy-dark);}
+button.secondary{background:var(--card);color:var(--navy-dark);border:1px solid var(--border-strong);}
+button.secondary:hover{background:var(--navy-tint);}
+button.danger{background:var(--card);color:var(--accent-dark);border:1px solid #e6c8c3;padding:0 var(--s3);}
+button.danger:hover{background:var(--accent-tint);}
+button:disabled{opacity:.45;cursor:not-allowed;}
+.lucide-icon{flex-shrink:0;}
+
+/* square icon-only action button (record rows, admin rows) */
+.btn-icon{width:var(--tap);padding:0;}
+
+.btnrow{display:flex;flex-wrap:wrap;gap:var(--s2);margin-top:var(--s4);}
+.btnrow button{flex:1 1 auto;}
+
+/* =============================================================== form wizard
+   Progressive: without the JS from README the .card blocks simply stack as
+   before (no step is hidden), so nothing breaks if the wizard is skipped.
+   ========================================================================== */
+.wizard-rail{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:var(--s3) var(--s4);margin-bottom:var(--s4);box-shadow:var(--shadow-1);
+}
+.wizard-rail .wz-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s3);}
+.wizard-rail .wz-title{font-size:14px;font-weight:700;color:var(--text);}
+.wizard-rail .wz-count{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;}
+.wizard-rail .wz-track{height:6px;border-radius:var(--r-pill);background:var(--viz-grid);margin-top:var(--s2);overflow:hidden;}
+.wizard-rail .wz-fill{height:100%;background:var(--navy);border-radius:var(--r-pill);transition:width .18s ease;}
+.wizard-rail .wz-steps{display:none;}
+
+.wizard-step[hidden]{display:none;}
+
+.wizard-actions{
+  position:sticky;bottom:calc(60px + env(safe-area-inset-bottom,0));z-index:15;
+  display:flex;flex-wrap:wrap;gap:var(--s2);
+  padding:var(--s3) 0;
+  background:color-mix(in srgb,var(--bg) 94%,transparent);
+  border-top:1px solid var(--border);
+}
+.wizard-actions .spacer{flex:1 1 10px;}
+.wizard-actions button{min-height:46px;}
+
+/* ================================================== indicator entry table ===
+   REFLOW (not scroll) below 1024px — see README for the rationale.
+   Needs data-label on the Yes/No cells (one line in buildStatusTable()).
+   ========================================================================== */
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+table.indicators{width:100%;border-collapse:collapse;font-size:13.5px;}
+table.indicators th,
+table.indicators td{border:1px solid var(--border);padding:var(--s3);text-align:left;vertical-align:middle;}
+table.indicators th{
+  background:var(--card-sunken);color:var(--muted);
+  font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+table.indicators td.center{text-align:center;width:64px;}
+table.indicators input[type=radio]{width:22px;height:22px;accent-color:var(--navy);}
+table.indicators input[type=text]{
+  width:100%;min-height:40px;padding:0 11px;
+  border:1px solid var(--border-strong);border-radius:var(--r-sm);
+  font-size:13px;color:var(--text);
+}
+
+@media (max-width:1023px){
+  table.indicators{display:block;border:none;}
+  table.indicators thead{display:none;}
+  table.indicators tbody{display:flex;flex-direction:column;gap:var(--s3);}
+  table.indicators tr{
+    display:block;border:1px solid var(--border);border-radius:var(--r-md);
+    padding:var(--s3);background:var(--card);
+  }
+  table.indicators td{display:block;border:none;padding:0;}
+  table.indicators td:first-child{font-size:14px;margin-bottom:var(--s3);}
+  /* Yes / No become a two-up segmented control */
+  table.indicators td.center{
+    display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);
+    width:calc(50% - 4px);min-height:var(--tap);
+    border:1.5px solid var(--border);border-radius:var(--r-sm);
+    background:var(--card-sunken);
+    font-size:14px;font-weight:700;color:var(--text-2);
+  }
+  table.indicators td.center:has(input:checked){border-color:var(--navy);background:var(--navy-tint);color:var(--navy-dark);}
+  table.indicators td.center + td.center{margin-left:var(--s2);}
+  table.indicators td.center::after{content:attr(data-label);}
+  table.indicators td:last-child{margin-top:var(--s3);}
+  table.indicators td:last-child input[type=text]{min-height:var(--tap);font-size:14px;}
+}
+
+/* =========================================================== records list ===
+   Mobile: stacked cards. >=1024px: the same rows read as a table-like grid.
+   ========================================================================== */
+.filter-bar{
+  display:flex;flex-wrap:wrap;gap:var(--s3);align-items:flex-end;
+  margin-top:var(--s4);padding-top:var(--s4);border-top:1px solid var(--border);
+}
+.filter-bar .field{flex:1 1 100%;margin-bottom:0;}
+.filter-bar #btnClearFilters{flex:1 1 100%;}
+.filter-count{font-size:12.5px;color:var(--muted);margin:var(--s3) 0 0;}
+.filter-count strong{color:var(--text);}
+
+.record-row{
+  display:flex;flex-direction:column;gap:var(--s3);
+  padding:var(--s3) 0;border-bottom:1px solid var(--border);
+}
+.record-row:last-child{border-bottom:none;}
+.record-main{font-size:14px;min-width:0;}
+.record-main .name{font-weight:700;color:var(--text);font-size:15px;}
+.record-main .sub{color:var(--muted);font-size:12.5px;margin-top:2px;}
+.record-actions{display:flex;flex-wrap:wrap;gap:var(--s2);}
+.record-actions button{flex:1 1 40%;min-height:46px;}
+
+.status-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 11px;border-radius:var(--r-pill);
+  font-size:11.5px;font-weight:700;white-space:nowrap;margin-left:var(--s2);
+}
+.status-ok{background:#e4f6ea;color:#0f6b34;}
+.status-needs{background:#fdf1dc;color:#7a4a00;}
+.status-temp{background:var(--accent-tint);color:#8f3a24;}
+.status-perm{background:#f1f2f2;color:#4a5450;}
+
+.empty{color:var(--muted);font-size:14px;text-align:center;padding:var(--s7) 0;}
+
+.pagination-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:var(--s3);
+  margin-top:var(--s4);padding-top:var(--s4);
+  border-top:1px solid var(--border);font-size:13px;color:var(--muted);
+}
+.pagination-bar button{
+  display:inline-flex;align-items:center;gap:6px;
+  min-height:var(--tap);padding:0 var(--s4);
+  background:var(--card);color:var(--navy-dark);
+  border:1px solid var(--border-strong);border-radius:var(--r-sm);
+  font-size:13.5px;font-weight:600;cursor:pointer;
+}
+.pagination-bar button:hover:not(:disabled){background:var(--navy-tint);}
+
+/* =============================================================== dashboard ==*/
+#tab-dashboard{max-width:var(--content-max);margin:0 auto;}
+
+.stat-grid{display:grid;grid-template-columns:1fr;gap:var(--s3);margin-bottom:var(--s4);}
+.stat-tile{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:var(--s4) var(--s5);box-shadow:var(--shadow-2);
+}
+.stat-tile .label{
+  display:flex;align-items:center;gap:var(--s2);
+  font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:var(--s2);
+}
+.stat-tile .value{font-size:30px;font-weight:700;color:var(--text);letter-spacing:-.02em;line-height:1.1;}
+/* lead tile: the one number leadership asks for */
+.stat-tile.stat-lead{background:var(--navy-dark);border-color:var(--navy-dark);box-shadow:0 8px 24px rgba(6,95,70,.18);}
+.stat-tile.stat-lead .label{color:var(--on-navy-faint);}
+.stat-tile.stat-lead .value{color:#fff;}
+
+.two-col{display:grid;grid-template-columns:1fr;gap:var(--s4);}
+
+/* horizontal bars: label ABOVE the bar, so long barangay names never get
+   squeezed into a 90px column or ellipsised away */
+.hbar-list{display:flex;flex-direction:column;gap:var(--s4);}
+.hbar-row{display:block;font-size:13px;}
+.hbar-row .hlabel{
+  display:block;font-weight:600;color:var(--text);
+  margin-bottom:6px;padding-right:96px;text-wrap:pretty;
+  white-space:normal;overflow:visible;
+}
+.hbar-row .hvalue{
+  float:right;font-weight:700;color:var(--text);
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.hbar-track{background:var(--viz-grid);border-radius:var(--r-pill);height:10px;overflow:hidden;clear:both;}
+.hbar-fill{height:100%;border-radius:var(--r-pill);background:var(--series-1);min-width:3px;}
+.hbar-fill:hover{filter:brightness(1.08);}
+
+.vbar-chart{
+  display:flex;align-items:flex-end;gap:var(--s2);
+  height:200px;padding-top:var(--s5);
+  border-bottom:1.5px solid var(--viz-baseline);
+}
+.vbar-col{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;}
+.vbar{width:70%;max-width:30px;background:var(--series-1);border-radius:5px 5px 0 0;min-height:3px;}
+.vbar:hover{filter:brightness(1.08);}
+/* axis labels sit below the baseline and rotate out of each other's way
+   on the narrowest screens */
+.vbar-col .vlabel{
+  font-size:11.5px;font-weight:600;color:var(--muted);
+  margin-top:var(--s2);white-space:nowrap;
+}
+@media (max-width:399px){
+  .vbar-col .vlabel{font-size:10.5px;transform:rotate(-45deg);transform-origin:top right;}
+  .vbar-chart{margin-bottom:var(--s5);}
+}
+
+.status-list{display:flex;flex-direction:column;gap:var(--s4);}
+.status-row{display:flex;align-items:center;gap:11px;font-size:13.5px;}
+.status-icon{display:inline-flex;flex-shrink:0;}
+.status-row .slabel{flex:1;min-width:0;color:var(--text);text-wrap:pretty;}
+.status-row .scount{font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;}
+
+.dash-tooltip{
+  position:fixed;pointer-events:none;z-index:1000;display:none;
+  background:var(--text);color:#fff;font-size:12px;
+  padding:6px 10px;border-radius:6px;white-space:nowrap;
+}
+
+/* ===================================================== document preview =====
+   #docSheet keeps its true 794px print geometry. On screen it is SCALED to
+   fit (never horizontally scrolled); .docsheet-wrap reserves the scaled
+   height so the page below it doesn't collapse. --sheet-scale is set by JS.
+   ========================================================================== */
+.preview-toolbar{
+  display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:var(--s3);margin-bottom:var(--s3);box-shadow:var(--shadow-1);
+}
+.preview-toolbar button{flex:1 1 auto;}
+.zoom-group{display:flex;gap:var(--s1);padding:var(--s1);background:#f0f3f1;border-radius:var(--r-sm);}
+.zoom-group button{
+  min-height:38px;padding:0 var(--s3);border:none;border-radius:7px;
+  background:transparent;color:var(--muted);font-size:12.5px;font-weight:600;cursor:pointer;
+}
+.zoom-group button.active{background:var(--card);color:var(--navy-dark);font-weight:700;box-shadow:0 1px 2px rgba(16,26,23,.12);}
+
+.docsheet-wrap{
+  --sheet-scale:1;
+  background:#e5eae7;border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:var(--s3);overflow:hidden;
+}
+.docsheet-wrap.is-actual-size{overflow:auto;-webkit-overflow-scrolling:touch;}
+.docsheet-box{height:calc(1123px * var(--sheet-scale));}
+#docSheet{
+  width:794px;flex-shrink:0;margin:0;
+  transform:scale(var(--sheet-scale));transform-origin:top left;
+  background:#fff;padding:50px 55px 40px;
+  border:none;box-shadow:0 4px 20px rgba(16,26,23,.14);
+  font-family:Arial,sans-serif;color:#111;
+}
+.docsheet-note{font-size:12.5px;color:var(--muted);margin:var(--s3) 0 0;}
+
+/* --- printed document internals: unchanged from v1.0 --------------------- */
+#docSheet img.letterhead{width:100%;display:block;margin-bottom:6px;}
+#docSheet hr.ruleline{border:none;border-top:2px solid #111;margin:6px 0 16px;}
+#docSheet h1.doctitle{text-align:center;font-size:16px;letter-spacing:.03em;margin:0 0 18px;text-decoration:underline;}
+.doc-fieldrow{display:flex;font-size:12.5px;margin-bottom:7px;}
+.doc-fieldrow .lbl{font-weight:bold;white-space:nowrap;margin-right:4px;}
+.doc-fieldrow .val{flex:1;border-bottom:1px solid #333;padding-bottom:1px;min-height:14px;}
+.doc-section-title{font-weight:bold;font-size:13px;margin:18px 0 8px;background:#eef2f6;padding:4px 8px;}
+table.doc-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px;}
+table.doc-table th,table.doc-table td{border:1px solid #333;padding:5px 6px;}
+table.doc-table th{background:#f0f0f0;text-align:left;font-size:11px;text-transform:uppercase;}
+table.doc-table td.chk{text-align:center;width:34px;}
+.doc-check-list{font-size:12.5px;line-height:1.9;}
+.doc-two-col{display:grid;grid-template-columns:1fr 1fr;gap:0 30px;}
+.doc-para-lines{font-size:12.5px;line-height:2.2;}
+.doc-para-lines .line{border-bottom:1px solid #999;min-height:18px;margin-bottom:4px;}
+.sig-block{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;margin-top:26px;}
+.sig-block h4{font-size:12px;text-transform:uppercase;border-bottom:1px solid #333;padding-bottom:4px;margin-bottom:14px;}
+.sig-line{font-size:12.5px;margin-bottom:16px;}
+.sig-line .u{display:inline-block;border-bottom:1px solid #333;min-width:190px;padding-bottom:1px;margin-left:4px;}
+.sig-line .sig-img{display:inline-block;height:36px;vertical-align:middle;margin-left:4px;border-bottom:1px solid #333;}
+#docSheet img.footerimg{width:100%;margin-top:26px;}
+
+/* ============================================================ signature pad =
+   The canvas is fluid; JS resizes the backing store on resize/orientation
+   change and repaints the saved strokes (see README).
+   ========================================================================== */
+.sig-pad-wrap{
+  display:block;width:100%;
+  border:1.5px dashed var(--border-strong);border-radius:var(--r-md);
+  background:#fff;overflow:hidden;
+}
+.sig-pad{
+  display:block;width:100%;aspect-ratio:3 / 1;height:auto;
+  touch-action:none;cursor:crosshair;
+}
+
+/* ================================================================= tablet ===*/
+@media (min-width:560px){
+  main{padding-left:var(--s4);padding-right:var(--s4);}
+  .card{padding:var(--s5) var(--s6);}
+  .stat-grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
+  .checkbox-grid{grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:var(--s2) var(--s3);}
+  .filter-bar .field{flex:1 1 170px;}
+  .filter-bar .field:first-child{flex:2 1 240px;}
+  .filter-bar #btnClearFilters{flex:0 0 auto;}
+  .record-actions button{flex:0 0 auto;}
+}
+
+@media (min-width:768px){
+  .grid2{grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:0 var(--s5);}
+  .two-col{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:var(--s5);}
+  .record-row{flex-direction:row;align-items:center;justify-content:space-between;gap:var(--s4);}
+  .record-actions{flex-wrap:nowrap;}
+  .preview-toolbar button{flex:0 0 auto;}
+  .wizard-rail .wz-head{margin-bottom:0;}
+}
+
+/* ============================================ desktop: sidebar navigation ===*/
+@media (min-width:1024px){
+  .app-shell{flex-direction:row;}
+
+  .app-topbar{
+    position:sticky;top:0;align-self:flex-start;
+    width:var(--sidebar);flex:0 0 var(--sidebar);height:100vh;
+    display:flex;flex-direction:column;background:var(--navy-dark);
+  }
+  header.appbar{
+    flex-direction:column;align-items:flex-start;gap:var(--s2);
+    padding:var(--s5) var(--s4) var(--s4);
+    border-bottom:1px solid rgba(255,255,255,.14);
+  }
+  header.appbar .appbar-left{gap:var(--s3);}
+  header.appbar .brand{align-items:flex-start;}
+  header.appbar .brand img{height:40px;width:40px;}
+  header.appbar h1{font-size:13.5px;line-height:1.3;white-space:normal;text-overflow:clip;}
+  .menu-toggle{display:none;}
+  header.appbar .header-account{
+    order:3;width:100%;margin-top:auto;
+    display:flex;flex-wrap:wrap;gap:var(--s2);
+  }
+
+  nav.tabs{
+    position:static;display:flex;flex-direction:column;gap:2px;flex:1;overflow-y:auto;
+    grid-template-columns:none;
+    background:transparent;border:none;box-shadow:none;
+    padding:var(--s3) 10px;
+  }
+  nav.tabs .tab-btn{
+    flex-direction:row;align-items:center;justify-content:flex-start;gap:11px;
+    min-height:46px;padding:0 var(--s3);
+    border-radius:var(--r-sm);
+    color:var(--on-navy-soft);font-size:13.5px;font-weight:600;text-align:left;
+  }
+  nav.tabs .tab-btn:hover{background:rgba(255,255,255,.08);color:#fff;}
+  nav.tabs .tab-btn.active{background:var(--navy);color:#fff;}
+  nav.tabs .tab-btn[href="/admin"],
+  nav.tabs .tab-btn.btn-logout{display:flex;}
+
+  .nav-account-mobile{
+    display:flex;flex-direction:column;
+    margin-top:auto;padding:var(--s3) 10px var(--s4);
+    border-top:1px solid rgba(255,255,255,.14);
+  }
+  .nav-whoami-row{padding:10px var(--s3);font-size:12.5px;color:var(--on-navy-faint);}
+
+  main{
+    max-width:none;flex:1;min-width:0;
+    padding:var(--s6) var(--s7) var(--s8);
+  }
+  main > section{max-width:var(--content-max);margin:0 auto;}
+
+  .wizard-actions{bottom:0;}
+
+  /* wizard rail becomes a 5-up stepper */
+  .wizard-rail{padding:var(--s4);}
+  .wizard-rail .wz-track,
+  .wizard-rail .wz-head{display:none;}
+  .wizard-rail .wz-steps{display:flex;gap:var(--s2);}
+  .wizard-rail .wz-step{
+    flex:1;min-width:0;display:flex;align-items:center;gap:10px;
+    min-height:52px;padding:var(--s2) var(--s3);
+    border:1px solid var(--border);border-radius:9px;
+    background:var(--card);cursor:pointer;text-align:left;
+  }
+  .wizard-rail .wz-step .n{
+    width:26px;height:26px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--viz-grid);color:var(--faint);
+    font-size:12px;font-weight:700;
+  }
+  .wizard-rail .wz-step .t{
+    min-width:0;font-size:13px;font-weight:700;color:var(--text-2);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .wizard-rail .wz-step.is-done .n{background:var(--series-2);color:#fff;}
+  .wizard-rail .wz-step.is-current{border-color:var(--navy);background:var(--navy-tint);}
+  .wizard-rail .wz-step.is-current .n{background:var(--navy);color:#fff;}
+  .wizard-rail .wz-step.is-current .t{color:var(--navy-dark);}
+}
+
+@media (min-width:1280px){
+  main{padding:var(--s7) var(--s8) var(--s8);}
+  .card{padding:var(--s6) var(--s7);}
+}
+
+/* short landscape phones: don't let chrome eat the viewport */
+@media (max-height:480px) and (orientation:landscape){
+  header.appbar{padding-top:6px;padding-bottom:6px;}
+  header.appbar .brand img{height:24px;width:24px;}
+  nav.tabs .tab-btn{min-height:48px;font-size:10px;}
+  main{padding-bottom:64px;}
+  .wizard-actions{position:static;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important;animation:none !important;}
+}
+
+/* =================================================================== print ==
+   Unchanged behaviour: only #docSheet prints, at true document geometry.
+   The screen-fit transform is explicitly reset.
+   ========================================================================== */
+@media print{
+  body *{visibility:hidden;}
+  #docSheet,#docSheet *{visibility:visible;}
+  .docsheet-wrap{--sheet-scale:1;background:none;border:none;padding:0;overflow:visible;}
+  .docsheet-box{height:auto !important;}
+  #docSheet{
+    position:absolute;top:0;left:0;
+    width:100%;margin:0;padding:30px 40px;
+    transform:none !important;
+    box-shadow:none;border:none;
+  }
+  .preview-toolbar,.app-topbar,nav.tabs,.wizard-actions,.docsheet-note{display:none !important;}
+}
