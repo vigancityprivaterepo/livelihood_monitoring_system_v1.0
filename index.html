@@ -1061,6 +1061,12 @@ function moveDashTooltip(e){
 function hideDashTooltip(){ dashTooltip.style.display = 'none'; }
 
 function fmtPeso(n){ return '₱' + Math.round(n).toLocaleString('en-US'); }
+function fmtPesoCompact(n){
+  const abs = Math.abs(n);
+  if(abs >= 1e6) return '₱' + (n/1e6).toFixed(1).replace(/\.0$/,'') + 'M';
+  if(abs >= 1e3) return '₱' + (n/1e3).toFixed(0) + 'K';
+  return '₱' + Math.round(n).toLocaleString('en-US');
+}
 function fmtNum(n){ return n.toLocaleString('en-US'); }
 
 const SERIES_COLORS = ['--series-1','--series-2','--series-3','--series-4','--series-5','--series-6','--series-7','--series-8'];
@@ -1108,7 +1114,7 @@ function renderYearGroupedChart(containerId, items){
     const col = document.createElement('div');
     col.className = 'vbar-col';
     col.innerHTML = `
-      <div class="vlabel-value">${fmtPeso(item.amount)}</div>
+      <div class="vlabel-value">${fmtPesoCompact(item.amount)}</div>
       <div class="vbar-pair">
         <div class="vbar series-a" style="height:${pctA}%;"></div>
         <div class="vbar series-b" style="height:${pctB}%;"></div>
