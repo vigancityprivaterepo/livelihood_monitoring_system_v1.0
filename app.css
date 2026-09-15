@@ -272,6 +272,10 @@ button:disabled{opacity:.45;cursor:not-allowed;}
 }
 .wizard-actions .spacer{flex:1 1 10px;}
 .wizard-actions button{min-height:46px;}
+/* button.primary/.secondary set display:inline-flex, which otherwise beats
+   the UA [hidden]{display:none} rule on specificity and keeps a hidden
+   wizard button visible */
+.wizard-actions [hidden]{display:none;}
 
 /* ================================================== indicator entry table ===
    REFLOW (not scroll) below 1024px — see README for the rationale.
@@ -299,23 +303,25 @@ table.indicators input[type=text]{
   table.indicators thead{display:none;}
   table.indicators tbody{display:flex;flex-direction:column;gap:var(--s3);}
   table.indicators tr{
-    display:block;border:1px solid var(--border);border-radius:var(--r-md);
+    display:flex;flex-wrap:wrap;gap:var(--s3);
+    border:1px solid var(--border);border-radius:var(--r-md);
     padding:var(--s3);background:var(--card);
   }
-  table.indicators td{display:block;border:none;padding:0;}
-  table.indicators td:first-child{font-size:14px;margin-bottom:var(--s3);}
-  /* Yes / No become a two-up segmented control */
+  table.indicators td{display:block;border:none;padding:0;margin:0;}
+  table.indicators td:first-child{flex:1 1 100%;font-size:14px;}
+  /* Yes / No become a two-up segmented control; flex gap (not inline
+     whitespace + manual width math) keeps the pair from wrapping */
   table.indicators td.center{
-    display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);
-    width:calc(50% - 4px);min-height:var(--tap);
+    flex:1 1 calc(50% - 6px);
+    display:flex;align-items:center;justify-content:center;gap:var(--s2);
+    min-height:var(--tap);
     border:1.5px solid var(--border);border-radius:var(--r-sm);
     background:var(--card-sunken);
     font-size:14px;font-weight:700;color:var(--text-2);
   }
   table.indicators td.center:has(input:checked){border-color:var(--navy);background:var(--navy-tint);color:var(--navy-dark);}
-  table.indicators td.center + td.center{margin-left:var(--s2);}
   table.indicators td.center::after{content:attr(data-label);}
-  table.indicators td:last-child{margin-top:var(--s3);}
+  table.indicators td:last-child{flex:1 1 100%;}
   table.indicators td:last-child input[type=text]{min-height:var(--tap);font-size:14px;}
 }
 
@@ -370,6 +376,10 @@ table.indicators input[type=text]{
 
 /* =============================================================== dashboard ==*/
 #tab-dashboard{max-width:var(--content-max);margin:0 auto;}
+/* the form reads better as a narrower column than the dashboard/records
+   width - on wide desktop screens content-max (1180px) stretched every
+   input full-width and split the wizard-actions buttons far apart */
+#tab-form{max-width:840px;margin:0 auto;}
 
 .dash-head{
   display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;
